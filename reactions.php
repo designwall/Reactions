@@ -13,21 +13,32 @@
 class DW_Reaction {
 	public function __construct() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_script' ) );
-		add_filter( 'the_content', array( $this, 'replace_content' ) );
+		add_action( 'wp_head', array( $this, 'head' ) );
+		add_action( 'admin_menu', array( $this, 'settings_page' ) );
+		add_action( 'admin_init', array( $this, 'save' ) );
 
 		// ajax action
 		add_action( 'wp_ajax_dw_reaction_save_action', array( $this, 'ajax' ) );
 	}
 
+	public function head() {
+		add_filter( 'the_content', array( $this, 'replace_content' ), 15 );
+	}
+
 	public function replace_content( $content ) {
+		global $wp_query;
 		if ( is_single() ) {
-			return $content . $this->layout() . $this->count_like_layout();
+			return $content . $this->layout();
 		}
 
 		return $content;
 	}
 
-	public function layout() {
+	public function layout( $post_id = false ) {
+		if ( $post_id ) {
+			$post_id = get_the_ID();
+		}
+
 		if ( is_user_logged_in() ) :
 		?>
 		<div class="dw-reactions">
@@ -43,6 +54,7 @@ class DW_Reaction {
 			</span>
 		</div>
 		<?php
+		$this->count_like_layout( $post_id );
 		endif;
 	}
 
@@ -125,12 +137,71 @@ class DW_Reaction {
 		return !empty( $result ) ? $result : false;
 	}
 
-	public function debug() {
-		$count = get_post_meta( 1, 'dw_reaction_like' );
+	public function shortcode( $atts = array() ) {
+		extract( shortcode_atts( array(
+			'id' => get_the_ID()
+		), $atts, 'reactions' ) );
 
-		print_r( $count );
-		die;
+		echo $this->layout( $id );
 	}
+
+	public function settings_page() {
+		add_submenu_page( 'options-general.php', __( 'Reactions Settings', 'reactions' ), __( 'Reactions Settings', 'reactions' ), 'manage_options', 'dw_reaction_settings', array( $this, 'setting_layout' ) );
+	}
+
+	public function setting_layout() {
+		$options = get_option( 'dw_reactions', array() );
+		$position = isset( $options['position'] ) ? $options['position'] : 'above';
+		$archive = isset( $options['pages']['archive'] ) ? $options['pages']['archive'] : false;
+		$posts = isset( $options['pages']['posts'] ) ? $options['pages']['posts'] : false;
+		$pages = isset( $options['pages']['pages'] ) ? $options['pages']['pages'] : false;
+		?>
+		<div class="wrap">
+			<form method="post">
+				<table class="form-table">
+					<tr>
+						<th><?php _e( 'Position', 'reactions' ); ?></th>
+						<td>
+							<label><input type="radio" name="reactions[position]" value="above" <?php checked( $position, 'above' ) ?>><span class="description"><?php _e( 'Above content', 'reactions' ) ?></span></label>
+						</td>
+					</tr>
+					<tr>
+						<th></th>
+						<td>
+							<label><input type="radio" name="reactions[position]" value="below" <?php checked( $position, 'below' ) ?>><span class="description"><?php _e( 'Below content', 'reactions' ) ?></span></label>
+						</td>
+					</tr>
+					<tr>
+						<th><?php _e( 'Pages', 'reactions' ) ?></th>
+						<td>
+							<label><input type="checkbox" name="reactions[pages][archive]" <?php checked( $archive, 'on' ) ?>><span class="description"><?php _e( 'Archive Pages', 'reactions' ) ?></span></label>
+						</td>
+					</tr>
+					<tr>
+						<th></th>
+						<td><label><input type="checkbox" name="reactions[pages][posts]"<?php checked( $posts, 'on' ) ?>><span class="description"><?php _e( 'All Posts', 'reactions' ) ?></span></label></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td><label><input type="checkbox" name="reactions[pages][pages]"<?php checked( $pages, 'on' ) ?>><span class="description" ><?php _e( 'All Pages', 'reactions' ) ?></span></label></td>
+					</tr>
+				</table>
+				<button type="submit" class="button button-primary"><?php _e( 'Save changes', 'reactions' ) ?></button>
+			</form>
+		</div>
+		<?php
+	}
+
+	public function save() {
+		if ( isset( $_POST['reactions'] ) ) {
+			update_option( 'dw_reactions', $_POST['reactions'] );
+		}
+	}
+}
+
+function dw_reactions() {
+	$reactions = new DW_Reaction();
+	echo $reactions->layout();
 }
 
 new DW_Reaction();
