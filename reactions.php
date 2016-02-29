@@ -42,12 +42,16 @@ class DW_Reaction {
 		endif;
 	}
 
-	public function count_like_layout() {
+	public function count_like_layout( $post_id = false ) {
+		if ( !$post_id ) {
+			$post_id = get_the_ID();
+		}
 		$reactions = array( 'like', 'love', 'haha', 'wow', 'sad', 'angry' );
+		$total = get_post_meta( $post_id, 'dw_reaction_total_liked', true );
 		echo '<div class="dw-reactions-count">';
 		echo '<ul>';
 		foreach( $reactions as $reaction ) {
-			$count = get_post_meta( get_the_ID(), 'dw_reaction_' . $reaction );
+			$count = get_post_meta( $post_id, 'dw_reaction_' . $reaction );
 
 			if ( !empty( $count ) ) {
 				echo '<li><img src="'. trailingslashit( plugin_dir_url( __FILE__ ) ) .'assets/img/'. $reaction .'.png"><span class="count">'. count( $count ) .'</span></li>';
@@ -81,11 +85,26 @@ class DW_Reaction {
 		// delete old reactions
 		$is_liked = $this->is_liked( get_current_user_id(), $_POST['post'] );
 		if ( $is_liked ) {
-			delete_post_meta( $_POST['post'], $is_liked );
+			delete_post_meta( $_POST['post'], $is_liked, get_current_user_id() );
 		}
+
+		if ( !$is_liked ) {
+			$total = get_post_meta( $_POST['post'], 'dw_reaction_total_liked', true ) ? get_post_meta( $_POST['post'], 'dw_reaction_total_liked', true ) : 0;
+			$total = (int) $total + 1;
+
+			update_post_meta( $_POST['post'], 'dw_reaction_total_liked', $total );
+		}
+
+		$count = get_post_meta( $_POST['post'], 'dw_reaction_' . $_POST['type'] );
 
 		// update to database
 		add_post_meta( $_POST['post'], 'dw_reaction_' . $_POST['type'], get_current_user_id() );
+
+		ob_start();
+		$this->count_like_layout( $_POST['post'] );
+		$content = ob_get_clean();
+
+		wp_send_json_success( array( 'html' => $content ) );
 	}
 
 	public function is_liked( $user_id = 0, $post_id = false ) {
@@ -100,6 +119,13 @@ class DW_Reaction {
 		$result = $wpdb->get_var( $query );
 
 		return !empty( $result ) ? $result : false;
+	}
+
+	public function debug() {
+		$count = get_post_meta( 1, 'dw_reaction_like' );
+
+		print_r( $count );
+		die;
 	}
 }
 

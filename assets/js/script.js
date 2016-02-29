@@ -53,7 +53,9 @@ jQuery(document).ready(function($){
 				post: parent.data('post')
 			},
 			success: function(data) {
-				console.log(data);
+				if ( data.success ) {
+					$('.dw-reactions-count').replaceWith(data.data.html);
+				}
 			}
 		});
 	})
