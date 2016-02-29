@@ -31,6 +31,22 @@ class DW_Reaction {
 		if ( is_user_logged_in() ) :
 		?>
 		<div class="dw-reactions">
+			<div class="dw-reactions-button">
+				<span class="dw-reactions-main-button"><?php _e( 'Like', 'reactions' ) ?></span>
+				<div class="dw-reactions-box" data-nonce="<?php echo wp_create_nonce( '_dw_reaction_action' ) ?>" data-post="<?php the_ID() ?>">
+					<span class="dw-reaction dw-reaction-like"><?php _e( 'Like', 'reactions' ) ?></span>
+					<span class="dw-reaction dw-reaction-love"><?php _e( 'Love', 'reactions' ) ?></span>
+					<span class="dw-reaction dw-reaction-haha"><?php _e( 'Haha', 'reactions' ) ?></span>
+					<span class="dw-reaction dw-reaction-wow"><?php _e( 'Wow', 'reactions' ) ?></span>
+					<span class="dw-reaction dw-reaction-sad"><?php _e( 'Sad', 'reactions' ) ?></span>
+					<span class="dw-reaction dw-reaction-angry"><?php _e( 'Angry', 'reactions' ) ?></span>
+				</div>
+			</div>
+			<div class="dw-reactions-count">
+				
+			</div>
+		</div>
+		<!-- <div class="dw-reactions">
 			<span class="like-btn">Like
 				<ul class="reactions-box" data-nonce="<?php echo wp_create_nonce( '_dw_reaction_action' ) ?>" data-post="<?php the_ID() ?>">
 					<li class="reaction reaction-like"></li>
@@ -41,7 +57,7 @@ class DW_Reaction {
 					<li class="reaction reaction-angry"></li>
 				</ul>
 			</span>
-		</div>
+		</div> -->
 		<?php
 		endif;
 	}
@@ -52,17 +68,17 @@ class DW_Reaction {
 		}
 		$reactions = array( 'like', 'love', 'haha', 'wow', 'sad', 'angry' );
 		$total = get_post_meta( $post_id, 'dw_reaction_total_liked', true );
-		echo '<div class="dw-reactions-count">';
-		echo '<ul>';
-		foreach( $reactions as $reaction ) {
-			$count = get_post_meta( $post_id, 'dw_reaction_' . $reaction );
+		// echo '<div class="dw-reactions-count">';
+		// echo '<ul>';
+		// foreach( $reactions as $reaction ) {
+		// 	$count = get_post_meta( $post_id, 'dw_reaction_' . $reaction );
 
-			if ( !empty( $count ) ) {
-				echo '<li><img src="'. trailingslashit( plugin_dir_url( __FILE__ ) ) .'assets/img/'. $reaction .'.png"><span class="count">'. count( $count ) .'</span></li>';
-			}
-		}
-		echo '</ul>';
-		echo '</div>';
+		// 	if ( !empty( $count ) ) {
+		// 		echo '<li><img src="'. trailingslashit( plugin_dir_url( __FILE__ ) ) .'assets/img/'. $reaction .'.png"><span class="count">'. count( $count ) .'</span></li>';
+		// 	}
+		// }
+		// echo '</ul>';
+		// echo '</div>';
 	}
 
 	public function enqueue_script() {
