@@ -45,16 +45,21 @@ class DW_Reaction {
 			<div class="dw-reactions-button">
 				<span class="dw-reactions-main-button"><?php _e( 'Like', 'reactions' ) ?></span>
 				<div class="dw-reactions-box" data-nonce="<?php echo wp_create_nonce( '_dw_reaction_action' ) ?>" data-post="<?php the_ID() ?>">
-					<span class="dw-reaction dw-reaction-like"><?php _e( 'Like', 'reactions' ) ?></span>
-					<span class="dw-reaction dw-reaction-love"><?php _e( 'Love', 'reactions' ) ?></span>
-					<span class="dw-reaction dw-reaction-haha"><?php _e( 'Haha', 'reactions' ) ?></span>
-					<span class="dw-reaction dw-reaction-wow"><?php _e( 'Wow', 'reactions' ) ?></span>
-					<span class="dw-reaction dw-reaction-sad"><?php _e( 'Sad', 'reactions' ) ?></span>
-					<span class="dw-reaction dw-reaction-angry"><?php _e( 'Angry', 'reactions' ) ?></span>
+					<span class="dw-reaction dw-reaction-like"><strong><?php _e( 'Like', 'reactions' ) ?></strong></span>
+					<span class="dw-reaction dw-reaction-love"><strong><?php _e( 'Love', 'reactions' ) ?></strong></span>
+					<span class="dw-reaction dw-reaction-haha"><strong><?php _e( 'Haha', 'reactions' ) ?></strong></span>
+					<span class="dw-reaction dw-reaction-wow"><strong><?php _e( 'Wow', 'reactions' ) ?></strong></span>
+					<span class="dw-reaction dw-reaction-sad"><strong><?php _e( 'Sad', 'reactions' ) ?></strong></span>
+					<span class="dw-reaction dw-reaction-angry"><strong><?php _e( 'Angry', 'reactions' ) ?></strong></span>
 				</div>
 			</div>
 			<div class="dw-reactions-count">
-				
+				<span class="dw-reaction-count dw-reaction-count-like"><strong>2</strong></span>
+				<span class="dw-reaction-count dw-reaction-count-love"><strong>0</strong></span>
+				<span class="dw-reaction-count dw-reaction-count-haha"><strong>4</strong></span>
+				<span class="dw-reaction-count dw-reaction-count-wow"><strong>5</strong></span>
+				<span class="dw-reaction-count dw-reaction-count-sad"><strong>1</strong></span>
+				<span class="dw-reaction-count dw-reaction-count-angry"><strong>7</strong></span>
 			</div>
 		</div>
 		<!-- <div class="dw-reactions">
