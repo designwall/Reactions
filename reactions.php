@@ -15,12 +15,12 @@ class DW_Reaction {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_script' ) );
 		add_filter( 'the_content', array( $this, 'replace_content' ) );
 
+		// ajax action
 		add_action( 'wp_ajax_dw_reaction_save_action', array( $this, 'ajax' ) );
-		add_action( 'init', array( $this, 'debug' ) );
 	}
 
 	public function replace_content( $content ) {
-		return $content . $this->layout();
+		return $content . $this->layout() . $this->count_like_layout();
 	}
 
 	public function layout() {
@@ -40,6 +40,21 @@ class DW_Reaction {
 		</div>
 		<?php
 		endif;
+	}
+
+	public function count_like_layout() {
+		$reactions = array( 'like', 'love', 'haha', 'wow', 'sad', 'angry' );
+		echo '<div class="dw-reactions-count">';
+		echo '<ul>';
+		foreach( $reactions as $reaction ) {
+			$count = get_post_meta( get_the_ID(), 'dw_reaction_' . $reaction );
+
+			if ( !empty( $count ) ) {
+				echo '<li><img src="'. trailingslashit( plugin_dir_url( __FILE__ ) ) .'assets/img/'. $reaction .'.png"><span class="count">'. count( $count ) .'</span></li>';
+			}
+		}
+		echo '</ul>';
+		echo '</div>';
 	}
 
 	public function enqueue_script() {
@@ -63,33 +78,28 @@ class DW_Reaction {
 			wp_send_json_error( array( 'message' => __( 'Missing type', 'reactions' ) ) );
 		}
 
-		$reaction = get_post_meta( $_POST['post'], 'dw_reaction_' . $_POST['type'], true );
-		$reaction = $reaction . ' ' .get_current_user_id();
+		// delete old reactions
+		$is_liked = $this->is_liked( get_current_user_id(), $_POST['post'] );
+		if ( $is_liked ) {
+			delete_post_meta( $_POST['post'], $is_liked );
+		}
 
-		update_post_meta( $_POST['post'], 'dw_reaction_' . $_POST['type'], $reaction );
+		// update to database
+		add_post_meta( $_POST['post'], 'dw_reaction_' . $_POST['type'], get_current_user_id() );
 	}
 
-	public function is_like( $user_id = 0, $post_id = false ) {
+	public function is_liked( $user_id = 0, $post_id = false ) {
 		global $wpdb;
 
-		$query = "SELECT * FROM {$wpdb->postmeta} WHERE meta_key = 'dw_reaction_love' AND FIND_IN_SET('{$user_id}', meta_value) > 0";
+		$query = "SELECT meta_key FROM {$wpdb->postmeta} WHERE meta_key IN ( 'dw_reaction_love', 'dw_reaction_like', 'dw_reaction_haha', 'dw_reaction_wow', 'dw_reaction_sad', 'dw_reaction_angry' ) AND meta_value = {$user_id}";
 
 		if ( $post_id ) {
 			$query .= " AND post_id = {$post_id}";
 		}
 
-		$result = $wpdb->get_col( $query );
-
-		//return $query;
+		$result = $wpdb->get_var( $query );
 
 		return !empty( $result ) ? $result : false;
-	}
-
-	public function debug() {
-		if ( isset( $_GET{'test'} ) ) {
-			print_r( $this->is_like( 1, 1 ) );
-			die;
-		}
 	}
 }
 
