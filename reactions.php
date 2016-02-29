@@ -20,7 +20,11 @@ class DW_Reaction {
 	}
 
 	public function replace_content( $content ) {
-		return $content . $this->layout() . $this->count_like_layout();
+		if ( is_single() ) {
+			return $content . $this->layout() . $this->count_like_layout();
+		}
+
+		return $content;
 	}
 
 	public function layout() {
