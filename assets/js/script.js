@@ -63,11 +63,7 @@ jQuery(document).ready(function($){
 		e.preventDefault();
 
 		var t = $(this);
-
-		// check if voted
-		if ( t.hasClass('dw_reaction_like') == false ) {
-			return false;
-		}
+		type = t.data('type');
 
 		$.ajax({
 			url: dw_reaction.ajax,
@@ -77,10 +73,16 @@ jQuery(document).ready(function($){
 				action: 'dw_reaction_save_action',
 				nonce: t.next().data('nonce'),
 				type: 'like',
-				post: t.next().data('post')
+				post: t.next().data('post'),
+				vote_type: type
 			},
 			success: function(data) {
 				if ( data.success ) {
+					if ( t.data('type') == 'unvote' ) {
+						t.attr('data-type', 'vote');
+					} else {
+						t.attr('data-type', 'unvote');
+					}
 					$('.dw-reactions-post-'+t.next().data('post')).find('.dw-reactions-count').replaceWith(data.data.html);
 				}
 			}

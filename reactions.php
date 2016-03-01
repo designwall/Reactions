@@ -83,12 +83,13 @@ class DW_Reaction {
 
 		$text = $this->get_reactions_text( get_current_user_id(), get_the_ID() );
 		$is_liked = $this->is_liked( get_current_user_id(), get_the_ID() );
+		$type = $is_liked ? 'unvote' : 'vote';
 
 		if ( is_user_logged_in() ) :
 		?>
 		<div class="dw-reactions dw-reactions-post-<?php the_ID() ?>">
 			<div class="dw-reactions-button">
-				<span class="dw-reactions-main-button <?php echo strtolower( $is_liked ) ?>"><?php echo $text ?></span>
+				<span class="dw-reactions-main-button <?php echo strtolower( $is_liked ) ?>" data-type="<?php echo $type ?>"><?php echo $text ?></span>
 				<div class="dw-reactions-box" data-nonce="<?php echo wp_create_nonce( '_dw_reaction_action' ) ?>" data-post="<?php the_ID() ?>">
 					<span class="dw-reaction dw-reaction-like"><strong><?php _e( 'Like', 'reactions' ) ?></strong></span>
 					<span class="dw-reaction dw-reaction-love"><strong><?php _e( 'Love', 'reactions' ) ?></strong></span>
@@ -159,6 +160,17 @@ class DW_Reaction {
 		$is_liked = $this->is_liked( get_current_user_id(), $_POST['post'] );
 		if ( $is_liked ) {
 			delete_post_meta( $_POST['post'], $is_liked, get_current_user_id() );
+			if ( isset( $_POST['vote_type'] ) && 'unvote' == $_POST['vote_type'] ) {
+				$total = get_post_meta( $_POST['post'], 'dw_reaction_total_liked', true ) ? get_post_meta( $_POST['post'], 'dw_reaction_total_liked', true ) : 0;
+				if ( $total >= 0 ) {
+					$total = (int) $total - 1;
+					update_post_meta( $_POST['post'], 'dw_reaction_total_liked', $total );
+				}
+				ob_start();
+				$this->count_like_layout( $_POST['post'] );
+				$content = ob_get_clean();
+				wp_send_json_success( array( 'html' => $content ) );
+			}
 		}
 
 		if ( !$is_liked ) {
