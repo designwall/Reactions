@@ -67,7 +67,7 @@
 .dw-reactions-box {
   position: absolute;
   top: -60px;
-  left: -40px;
+  left: 0;
   background: #fff;
   padding: 10px;
   border: 1px solid rgba(0,0,0,0.2);
