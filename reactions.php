@@ -169,7 +169,7 @@ class DW_Reaction {
 				ob_start();
 				$this->count_like_layout( $_POST['post'] );
 				$content = ob_get_clean();
-				wp_send_json_success( array( 'html' => $content ) );
+				wp_send_json_success( array( 'html' => $content, 'type' => 'unvoted' ) );
 			}
 		}
 
@@ -189,7 +189,7 @@ class DW_Reaction {
 		$this->count_like_layout( $_POST['post'] );
 		$content = ob_get_clean();
 
-		wp_send_json_success( array( 'html' => $content ) );
+		wp_send_json_success( array( 'html' => $content, 'type' => 'voted' ) );
 	}
 
 	/**

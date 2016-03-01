@@ -78,9 +78,11 @@ jQuery(document).ready(function($){
 			},
 			success: function(data) {
 				if ( data.success ) {
-					if ( t.data('type') == 'unvote' ) {
+					if ( data.data.type == 'unvoted' ) {
+						$('.dw-reactions-post-'+t.next().data('post')).find('.dw-reactions-main-button').attr('class', 'dw-reactions-main-button');
 						t.attr('data-type', 'vote');
 					} else {
+						$('.dw-reactions-post-'+t.next().data('post')).find('.dw-reactions-main-button').addClass('dw_reaction_like');
 						t.attr('data-type', 'unvote');
 					}
 					$('.dw-reactions-post-'+t.next().data('post')).find('.dw-reactions-count').replaceWith(data.data.html);
