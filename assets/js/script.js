@@ -34,7 +34,7 @@ jQuery(document).ready(function($){
 	$('.dw-reaction').on('click', function(e){
 		e.preventDefault();
 
-		var t = $(this), $class = $(this).attr('class'), parent = t.parent();
+		var t = $(this), $class = $(this).attr('class'), parent = t.parent(), text = t.find('strong').text();
 		res = $class.split(' ');
 		type = res[1].split('-');
 
@@ -52,7 +52,36 @@ jQuery(document).ready(function($){
 			},
 			success: function(data) {
 				if ( data.success ) {
-					$('.dw-reactions-count').replaceWith(data.data.html);
+					$('.dw-reactions-post-'+parent.data('post')).find('.dw-reactions-count').replaceWith(data.data.html);
+					$('.dw-reactions-post-'+parent.data('post')).find('.dw-reactions-main-button').attr('class','dw-reactions-main-button').addClass('dw_reaction_'+type[2]).text(text);
+				}
+			}
+		});
+	});
+
+	$('.dw-reactions-main-button').on('click', function(e) {
+		e.preventDefault();
+
+		var t = $(this);
+
+		// check if voted
+		if ( t.hasClass('dw_reaction_like') == false ) {
+			return false;
+		}
+
+		$.ajax({
+			url: dw_reaction.ajax,
+			dataType: 'json',
+			type: 'POST',
+			data: {
+				action: 'dw_reaction_save_action',
+				nonce: t.next().data('nonce'),
+				type: 'like',
+				post: t.next().data('post')
+			},
+			success: function(data) {
+				if ( data.success ) {
+					$('.dw-reactions-post-'+t.next().data('post')).find('.dw-reactions-count').replaceWith(data.data.html);
 				}
 			}
 		});
