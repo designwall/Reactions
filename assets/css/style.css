@@ -64,6 +64,50 @@
   background-repeat: no-repeat;
 }
 
+.dw-reactions-main-button.dw_reaction_like {
+  color: rgb(88, 144, 255);
+}
+
+.dw-reactions-main-button.dw_reaction_love {
+  color: rgb(242, 82, 104);
+}
+
+.dw-reactions-main-button.dw_reaction_haha {
+  color: rgb(240, 186, 21);
+}
+
+.dw-reactions-main-button.dw_reaction_wow {
+  color: rgb(240, 186, 21);
+}
+
+.dw-reactions-main-button.dw_reaction_sad {
+  color: rgb(240, 186, 21);
+}
+
+.dw-reactions-main-button.dw_reaction_angry {
+  color: rgb(247, 113, 75);
+}
+
+.dw-reactions-main-button.dw_reaction_love:before {
+  background-image: url(../img/love.png);
+}
+
+.dw-reactions-main-button.dw_reaction_haha:before {
+  background-image: url(../img/haha.png);
+}
+
+.dw-reactions-main-button.dw_reaction_wow:before {
+  background-image: url(../img/wow.png);
+}
+
+.dw-reactions-main-button.dw_reaction_sad:before {
+  background-image: url(../img/sad.png);
+}
+
+.dw-reactions-main-button.dw_reaction_angry:before {
+  background-image: url(../img/angry.png);
+}
+
 .dw-reactions-box {
   position: absolute;
   top: -60px;
