@@ -53,7 +53,7 @@ jQuery(document).ready(function($){
 			success: function(data) {
 				if ( data.success ) {
 					$('.dw-reactions-post-'+parent.data('post')).find('.dw-reactions-count').replaceWith(data.data.html);
-					$('.dw-reactions-post-'+parent.data('post')).find('.dw-reactions-main-button').attr('class','dw-reactions-main-button').addClass('dw_reaction_'+type[2]).text(text);
+					$('.dw-reactions-post-'+parent.data('post')).find('.dw-reactions-main-button').attr('class','dw-reactions-main-button').addClass('dw_reaction_'+type[2]).text(text).attr('data-type', 'unvote');
 				}
 			}
 		});
@@ -63,7 +63,8 @@ jQuery(document).ready(function($){
 		e.preventDefault();
 
 		var t = $(this);
-		type = t.data('type');
+		type = t.attr('data-type');
+		text = t.parent().find('.dw-reaction-like strong').text();
 
 		$.ajax({
 			url: dw_reaction.ajax,
@@ -79,11 +80,11 @@ jQuery(document).ready(function($){
 			success: function(data) {
 				if ( data.success ) {
 					if ( data.data.type == 'unvoted' ) {
-						$('.dw-reactions-post-'+t.next().data('post')).find('.dw-reactions-main-button').attr('class', 'dw-reactions-main-button');
-						t.attr('data-type', 'vote');
+						$('.dw-reactions-post-'+t.next().data('post')).find('.dw-reactions-main-button').attr('class', 'dw-reactions-main-button').text(text);
+						$('.dw-reactions-post-'+t.next().data('post')).find('.dw-reactions-main-button').attr('data-type', 'vote');
 					} else {
 						$('.dw-reactions-post-'+t.next().data('post')).find('.dw-reactions-main-button').addClass('dw_reaction_like');
-						t.attr('data-type', 'unvote');
+						$('.dw-reactions-post-'+t.next().data('post')).find('.dw-reactions-main-button').attr('data-type', 'unvote');
 					}
 					$('.dw-reactions-post-'+t.next().data('post')).find('.dw-reactions-count').replaceWith(data.data.html);
 				}
