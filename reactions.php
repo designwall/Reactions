@@ -16,6 +16,7 @@ class DW_Reaction {
 		add_action( 'wp_head', array( $this, 'head' ) );
 		add_action( 'admin_menu', array( $this, 'settings_page' ) );
 		add_action( 'admin_init', array( $this, 'save' ) );
+		add_shortcode( 'reactions', array( $this, 'shortcode' ) );
 
 		// ajax action
 		add_action( 'wp_ajax_dw_reaction_save_action', array( $this, 'ajax' ) );
@@ -27,7 +28,7 @@ class DW_Reaction {
 
 	public function replace_content( $content ) {
 		global $wp_query;
-		if ( is_single() ) {
+		if ( $this->enable_in_single_post() || $this->enable_in_archive() || $this->enable_in_pages() || $this->enable_in_home() ) {
 			return $content . $this->layout();
 		}
 
@@ -39,9 +40,11 @@ class DW_Reaction {
 			$post_id = get_the_ID();
 		}
 
+		$class = 'dw-reactions-' . $this->position();
+
 		if ( is_user_logged_in() ) :
 		?>
-		<div class="dw-reactions">
+		<div class="dw-reactions <?php echo esc_html( $class ) ?>">
 			<div class="dw-reactions-button">
 				<span class="dw-reactions-main-button"><?php _e( 'Like', 'reactions' ) ?></span>
 				<div class="dw-reactions-box" data-nonce="<?php echo wp_create_nonce( '_dw_reaction_action' ) ?>" data-post="<?php the_ID() ?>">
@@ -53,29 +56,9 @@ class DW_Reaction {
 					<span class="dw-reaction dw-reaction-angry"><strong><?php _e( 'Angry', 'reactions' ) ?></strong></span>
 				</div>
 			</div>
-			<div class="dw-reactions-count">
-				<span class="dw-reaction-count dw-reaction-count-like"><strong>2</strong></span>
-				<span class="dw-reaction-count dw-reaction-count-love"><strong>0</strong></span>
-				<span class="dw-reaction-count dw-reaction-count-haha"><strong>4</strong></span>
-				<span class="dw-reaction-count dw-reaction-count-wow"><strong>5</strong></span>
-				<span class="dw-reaction-count dw-reaction-count-sad"><strong>1</strong></span>
-				<span class="dw-reaction-count dw-reaction-count-angry"><strong>7</strong></span>
-			</div>
+			<?php $this->count_like_layout( $post_id ); ?>
 		</div>
-		<!-- <div class="dw-reactions">
-			<span class="like-btn">Like
-				<ul class="reactions-box" data-nonce="<?php echo wp_create_nonce( '_dw_reaction_action' ) ?>" data-post="<?php the_ID() ?>">
-					<li class="reaction reaction-like"></li>
-					<li class="reaction reaction-love"></li>
-					<li class="reaction reaction-haha"></li>
-					<li class="reaction reaction-wow"></li>
-					<li class="reaction reaction-sad"></li>
-					<li class="reaction reaction-angry"></li>
-				</ul>
-			</span>
-		</div> -->
 		<?php
-		$this->count_like_layout( $post_id );
 		endif;
 	}
 
@@ -85,17 +68,15 @@ class DW_Reaction {
 		}
 		$reactions = array( 'like', 'love', 'haha', 'wow', 'sad', 'angry' );
 		$total = get_post_meta( $post_id, 'dw_reaction_total_liked', true );
-		// echo '<div class="dw-reactions-count">';
-		// echo '<ul>';
-		// foreach( $reactions as $reaction ) {
-		// 	$count = get_post_meta( $post_id, 'dw_reaction_' . $reaction );
+		echo '<div class="dw-reactions-count">';
+		foreach( $reactions as $reaction ) {
+			$count = get_post_meta( $post_id, 'dw_reaction_' . $reaction );
 
-		// 	if ( !empty( $count ) ) {
-		// 		echo '<li><img src="'. trailingslashit( plugin_dir_url( __FILE__ ) ) .'assets/img/'. $reaction .'.png"><span class="count">'. count( $count ) .'</span></li>';
-		// 	}
-		// }
-		// echo '</ul>';
-		// echo '</div>';
+			if ( !empty( $count ) ) {
+				echo '<span class="dw-reaction-count dw-reaction-count-'.$reaction.'"><strong>'.count( $count ).'</strong></span>';
+			}
+		}
+		echo '</div>';
 	}
 
 	public function enqueue_script() {
@@ -176,6 +157,7 @@ class DW_Reaction {
 		$archive = isset( $options['pages']['archive'] ) ? $options['pages']['archive'] : false;
 		$posts = isset( $options['pages']['posts'] ) ? $options['pages']['posts'] : false;
 		$pages = isset( $options['pages']['pages'] ) ? $options['pages']['pages'] : false;
+		$home = isset( $options['pages']['home'] ) ? $options['pages']['home'] : false;
 		?>
 		<div class="wrap">
 			<form method="post">
@@ -194,9 +176,11 @@ class DW_Reaction {
 					</tr>
 					<tr>
 						<th><?php _e( 'Pages', 'reactions' ) ?></th>
-						<td>
-							<label><input type="checkbox" name="reactions[pages][archive]" <?php checked( $archive, 'on' ) ?>><span class="description"><?php _e( 'Archive Pages', 'reactions' ) ?></span></label>
-						</td>
+						<td><label><input type="checkbox" name="reactions[pages][home]"<?php checked( $home, 'on' ) ?>><span class="description" ><?php _e( 'Homepage', 'reactions' ) ?></span></label></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td><label><input type="checkbox" name="reactions[pages][archive]" <?php checked( $archive, 'on' ) ?>><span class="description"><?php _e( 'Archives', 'reactions' ) ?></span></label></td>
 					</tr>
 					<tr>
 						<th></th>
@@ -217,6 +201,70 @@ class DW_Reaction {
 		if ( isset( $_POST['reactions'] ) ) {
 			update_option( 'dw_reactions', $_POST['reactions'] );
 		}
+	}
+
+	public function enable_in_single_post() {
+		$options = get_option( 'dw_reactions', array() );
+
+		if ( 'posts' == $this->template_type() && isset( $options['pages']['posts'] ) && 'on' == $options['pages']['posts'] ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public function enable_in_pages() {
+		$options = get_option( 'dw_reactions', array() );
+
+		if ( 'pages' == $this->template_type() && isset( $options['pages']['pages'] ) && 'on' == $options['pages']['pages'] ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public function enable_in_archive() {
+		$options = get_option( 'dw_reactions', array() );
+
+		if ( 'archive' == $this->template_type() && isset( $options['pages']['archive'] ) && 'on' == $options['pages']['archive'] ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public function enable_in_home() {
+		$options = get_option( 'dw_reactions', array() );
+
+		if ( 'home' == $this->template_type() && isset( $options['pages']['home'] ) && 'on' == $options['pages']['home'] ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public function template_type() {
+		global $post;
+
+		if ( is_home() || is_front_page() ) {
+			$type = 'home';
+		} elseif ( is_archive() ) {
+			$type = 'archive';
+		} elseif ( is_object( $post ) && is_page( $post->ID ) ) {
+			$type = 'pages';
+		} elseif ( is_single() ) {
+			$type = 'posts';
+		} else {
+			$type = false;
+		}
+
+		return $type;
+	}
+
+	public function position() {
+		$options = get_option( 'dw_reactions', array() );
+
+		return isset( $options['position'] ) ? $options['position'] : 'above';
 	}
 }
 

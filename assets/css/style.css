@@ -77,7 +77,7 @@
   z-index: -1;
 }
 
-.dw-reactions-button:hover .dw-reactions-box {
+.dw-reactions-button.reaction-show .dw-reactions-box {
   display: block;
   z-index: 1;
 }
@@ -97,7 +97,7 @@
   transition: opacity .5s ease-in-out 1s, transform .07s ease-in-out 0s, top .07s ease-in-out 0s;
 }
 
-.dw-reactions-button:hover .dw-reaction {
+.dw-reactions-button.reaction-show .dw-reaction {
   opacity: 1;
   animation-name: reaction;
   animation-duration: .5s;
@@ -139,27 +139,27 @@
   background-image: url(../img/angry.png);
 }
 
-.dw-reactions-button:hover .dw-reaction {
+.dw-reactions-button.reaction-show .dw-reaction {
   animation-delay: 0s;
 }
 
-.dw-reactions-button:hover .dw-reaction-love {
+.dw-reactions-button.reaction-show .dw-reaction-love {
   animation-delay: .05s;
 }
 
-.dw-reactions-button:hover .dw-reaction-haha {
+.dw-reactions-button.reaction-show .dw-reaction-haha {
   animation-delay: .1s;
 }
 
-.dw-reactions-button:hover .dw-reaction-wow {
+.dw-reactions-button.reaction-show .dw-reaction-wow {
   animation-delay: .15s;
 }
 
-.dw-reactions-button:hover .dw-reaction-sad {
+.dw-reactions-button.reaction-show .dw-reaction-sad {
   animation-delay: .2s;
 }
 
-.dw-reactions-button:hover .dw-reaction-angry {
+.dw-reactions-button.reaction-show .dw-reaction-angry {
   animation-delay: .25s;
 }
 
