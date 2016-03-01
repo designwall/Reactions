@@ -180,10 +180,11 @@
   text-align: center;
   left: 0;
   border-radius: 38px;
-  padding: 0 8px 1px;
+  padding: 1px 0;
   width: 38px;
   opacity: 0;
   transition: opacity .2s ease-in-out 0s;
+  box-sizing: border-box;
 }
 
 .dw-reaction:hover strong {
