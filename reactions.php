@@ -287,50 +287,51 @@ class DW_Reaction {
 		?>
 		<div class="wrap">
 			<h2><?php echo get_admin_page_title(); ?></h2>
+			<?php _e( 'To display the reactions button on your blog posts, you can use one of two ways below:', 'reactions' ); ?>
 			<form method="post">
-				<h3><?php _e( '1. Auto display reactions button', 'reactions' ) ?></h3>
+				<h3><?php _e( '1. Automatically display on the content of each post.', 'reactions' ) ?></h3>
 				<table class="form-table">
 					<tr>
-						<th><?php _e( 'Enable?', 'reactions' ) ?></th>
+						<th></th>
 						<td><label>
-							<input type="checkbox" name="reactions[enable]" <?php checked( $this->is_enable(), true ) ?>><span class="description"><?php _e( 'Enable Reactions', 'reactions' ) ?></span>
+							<input type="checkbox" name="reactions[enable]" <?php checked( $this->is_enable(), true ) ?>><span class="description"><?php _e( 'Show main reactions button.', 'reactions' ) ?></span>
 						</label></td>
 					</tr>
 					<tr>
-						<th><?php _e( 'Reactions Vote Count', 'reactions' ) ?></th>
+						<th></th>
 						<td>
-							<label><input type="checkbox" name="reactions[enable_count]" <?php checked( $this->enable_count(), true ) ?>><span class="description"><?php _e( 'Enable', 'reactions' ) ?></span></label>
+							<label><input type="checkbox" name="reactions[enable_count]" <?php checked( $this->enable_count(), true ) ?>><span class="description"><?php _e( 'Show reactions count.', 'reactions' ) ?></span></label>
 						</td>
 					</tr>
 					<tr>
-						<th><?php _e( 'Position', 'reactions' ); ?></th>
+						<th><?php _e( 'Positions', 'reactions' ); ?></th>
 						<td>
-							<p><label><input type="checkbox" name="reactions[position][above]" <?php checked( $above, 'on' ) ?>><span class="description"><?php _e( 'Above content', 'reactions' ) ?></span></label></p>
-							<p><label><input type="checkbox" name="reactions[position][below]" <?php checked( $below, 'on' ) ?>><span class="description"><?php _e( 'Below content', 'reactions' ) ?></span></label></p>
+							<p><label><input type="checkbox" name="reactions[position][above]" <?php checked( $above, 'on' ) ?>><span class="description"><?php _e( 'Show the reactions button above the post content.', 'reactions' ) ?></span></label></p>
+							<p><label><input type="checkbox" name="reactions[position][below]" <?php checked( $below, 'on' ) ?>><span class="description"><?php _e( 'Show the reactions button below the post content.', 'reactions' ) ?></span></label></p>
 						</td>
 					</tr>
 					<tr>
 						<th><?php _e( 'Pages', 'reactions' ) ?></th>
 						<td>
-							<p><label><input type="checkbox" name="reactions[pages][home]"<?php checked( $home, 'on' ) ?>><span class="description" ><?php _e( 'Homepage', 'reactions' ) ?></span></label></p>
-							<p><label><input type="checkbox" name="reactions[pages][archive]" <?php checked( $archive, 'on' ) ?>><span class="description"><?php _e( 'Archives', 'reactions' ) ?></span></label></p>
-							<p><label><input type="checkbox" name="reactions[pages][posts]"<?php checked( $posts, 'on' ) ?>><span class="description"><?php _e( 'Posts', 'reactions' ) ?></span></label></p>
-							<p><label><input type="checkbox" name="reactions[pages][pages]"<?php checked( $pages, 'on' ) ?>><span class="description" ><?php _e( 'Pages', 'reactions' ) ?></span></label></p>
+							<p><label><input type="checkbox" name="reactions[pages][home]"<?php checked( $home, 'on' ) ?>><span class="description" ><?php _e( 'Show on Homepage', 'reactions' ) ?></span></label></p>
+							<p><label><input type="checkbox" name="reactions[pages][archive]" <?php checked( $archive, 'on' ) ?>><span class="description"><?php _e( 'Show on Archive pages', 'reactions' ) ?></span></label></p>
+							<p><label><input type="checkbox" name="reactions[pages][posts]"<?php checked( $posts, 'on' ) ?>><span class="description"><?php _e( 'Show on all Posts', 'reactions' ) ?></span></label></p>
+							<p><label><input type="checkbox" name="reactions[pages][pages]"<?php checked( $pages, 'on' ) ?>><span class="description" ><?php _e( 'Show on all Pages', 'reactions' ) ?></span></label></p>
 						</td>
 					</tr>
 				</table>
 				<hr>
-				<h3><?php _e( '2. Manually Insert Short codes or function to your theme', 'reactions' ) ?></h3>
+				<h3><?php _e( '2. Manually insert into your theme.', 'reactions' ) ?></h3>
 				<p>
 					<ol>
 						<li><?php _e( 'Open <code>wp-content/themes/&lt;Your theme folder&gt;/</code>', 'reactions' ); ?></li>
 						<li><?php _e( 'You may place it in <code>archive.php</code>, <code>single.php</code>, <code>post.php</code> or <code>page.php</code> also.', 'reactions' ); ?></li>
 						<li><?php _e( 'Find <code>&lt;&#63;php while (have_posts()) : the_post(); &#63;&gt;</code>', 'reactions' ); ?></li>
-						<li><?php _e( "Add Anywhere Below it(The place you want Reactions to show): <code>&lt;&#63;php if (function_exists('dw_reactions')) { dw_reactions() } &#63;&gt;</code>", 'reactions' ); ?></li>
+						<li><?php _e( "Add Anywhere Below it (The place you want Reactions to show): <code>&lt;&#63;php if (function_exists('dw_reactions')) { dw_reactions() } &#63;&gt;</code>", 'reactions' ); ?></li>
 					</ol>
 					<ul>
 						<li><?php _e( '- If you DO NOT want the reactions to appear in every post/page, DO NOT use the code above. Just type in <code>[reactions]</code> into the selected post/page and it will embed reactions into that post/page only.', 'reactions' ); ?></li>
-						<li><?php _e( '- If you want to embed other post reactions user <code>[reactions id="1"]</code>, where 1 is the ID of the post/page ratings that you want to display.', 'reactions' ); ?></li>
+						<li><?php _e( '- If you want to embed other post reactions user <code>[reactions id="1"]</code>, where 1 is the ID of the post/page reactions that you want to display.', 'reactions' ); ?></li>
 					</ul>
 				</p>
 				<button type="submit" class="button button-primary"><?php _e( 'Save changes', 'reactions' ) ?></button>
