@@ -16,12 +16,20 @@ class DW_Reaction {
 		add_action( 'wp_head', array( $this, 'head' ) );
 		add_action( 'admin_menu', array( $this, 'settings_page' ) );
 		add_action( 'admin_init', array( $this, 'save' ) );
+		add_action( 'init', array( $this, 'init' ) );
+
+		// register shortcode
 		add_shortcode( 'reactions', array( $this, 'shortcode' ) );
 
 		// ajax action
 		add_action( 'wp_ajax_dw_reaction_save_action', array( $this, 'ajax' ) );
 	}
 
+	public function init() {
+		// Load translate text domain
+		load_plugin_textdomain( 'reactions', false,  plugin_basename( dirname( __FILE__ ) )  . '/languages' );
+	}
+	
 	public function head() {
 		add_filter( 'the_content', array( $this, 'replace_content' ), 15 );
 	}
