@@ -20,6 +20,7 @@ class DW_Reaction {
 		// register shortcode
 		add_shortcode( 'reactions', array( $this, 'shortcode_reactions' ) );
 		add_shortcode( 'reactions_count', array( $this, 'shortcode_reactions_count' ) );
+		register_activation_hook( __FILE__, array( $this, 'set_default_setting' ) );
 	}
 
 	/**
@@ -36,6 +37,25 @@ class DW_Reaction {
 
 		// ajax action
 		add_action( 'wp_ajax_dw_reaction_save_action', array( $this, 'ajax' ) );
+	}
+
+	public function set_default_setting() {
+		$data = array(
+			'enable' 		=> 'on',
+			'enable_count' 	=> 'on',
+			'position'		=> array(
+				'above' 	=> 'on',
+				'below' 	=> 'on',
+			),
+			'pages' 		=> array(
+				'home' 		=> 'on',
+				'archive' 	=> 'on',
+				'posts' 	=> 'on',
+				'pages' 	=> 'on'
+			)
+		);
+
+		update_option( 'dw_reactions', $data );
 	}
 
 	/**
