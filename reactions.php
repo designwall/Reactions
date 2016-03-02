@@ -2,7 +2,7 @@
 /*
 * Plugin Name: Reactions
 * Plugin URI: http://www.designwal.com/
-* Description:
+* Description: A simple plugin that helps you integrate reaction buttons into your WordPress site look like Facebook.
 * Author: DesignWall
 * Author URI: http://www.designwal.com/
 *
