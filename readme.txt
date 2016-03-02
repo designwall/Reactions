@@ -28,7 +28,7 @@ Along with using option, you can quickly use the short-code [reaction] or PHP Fu
 = Contribute =
 
 We will update the plugin regularly. If you have any suggestions for the product, please drop a line in the support forum. In addition, we are willing to welcome you translate the plugin into your native language here
-[https://translate.wordpress.org/projects/wp-plugins/reactions](https://translate.wordpress.org/projects/wp-plugins/reactions)
+[https://translate.wordpress.org/projects/wp-plugins/dw-reactions](https://translate.wordpress.org/projects/wp-plugins/dw-reactions)
 
 == Documents and Support ==
 
