@@ -76,7 +76,7 @@ class DW_Reaction {
 	*
 	* @param int $post_id (default: false)
 	*/
-	public function layout( $post_id = false ) {
+	public function layout( $post_id = false, $button = true, $count = true ) {
 		if ( $post_id ) {
 			$post_id = get_the_ID();
 		}
@@ -88,6 +88,7 @@ class DW_Reaction {
 		if ( is_user_logged_in() ) :
 		?>
 		<div class="dw-reactions dw-reactions-post-<?php the_ID() ?>">
+			<?php if ( $button ) : ?>
 			<div class="dw-reactions-button">
 				<span class="dw-reactions-main-button <?php echo strtolower( $is_liked ) ?>" data-type="<?php echo $type ?>"><?php echo $text ?></span>
 				<div class="dw-reactions-box" data-nonce="<?php echo wp_create_nonce( '_dw_reaction_action' ) ?>" data-post="<?php the_ID() ?>">
@@ -99,7 +100,8 @@ class DW_Reaction {
 					<span class="dw-reaction dw-reaction-angry"><strong><?php _e( 'Angry', 'reactions' ) ?></strong></span>
 				</div>
 			</div>
-			<?php if ( $this->enable_count() ) : ?>
+			<?php endif; ?>
+			<?php if ( ( $this->enable_count() && $this->is_enable() ) || ( $this->is_enable() && $count ) ) : ?>
 				<?php $this->count_like_layout( $post_id ); ?>
 			<?php endif; ?>
 		</div>
@@ -247,10 +249,12 @@ class DW_Reaction {
 	*/
 	public function shortcode_reactions( $atts = array() ) {
 		extract( shortcode_atts( array(
-			'id' => get_the_ID()
+			'id' => get_the_ID(),
+			'button' => true,
+			'count'	=> true,
 		), $atts, 'reactions' ) );
 
-		echo $this->layout( $id );
+		echo $this->layout( $id, $button, $count );
 	}
 
 	/**
@@ -292,15 +296,11 @@ class DW_Reaction {
 				<h3><?php _e( '1. Automatically display on the content of each post.', 'reactions' ) ?></h3>
 				<table class="form-table">
 					<tr>
-						<th></th>
-						<td><label>
-							<input type="checkbox" name="reactions[enable]" <?php checked( $this->is_enable(), true ) ?>><span class="description"><?php _e( 'Show main reactions button.', 'reactions' ) ?></span>
-						</label></td>
-					</tr>
-					<tr>
-						<th></th>
 						<td>
-							<label><input type="checkbox" name="reactions[enable_count]" <?php checked( $this->enable_count(), true ) ?>><span class="description"><?php _e( 'Show reactions count.', 'reactions' ) ?></span></label>
+							<p><label>
+								<input type="checkbox" name="reactions[enable]" <?php checked( $this->is_enable(), true ) ?>><span class="description"><?php _e( 'Show reactions button.', 'reactions' ) ?></span>
+							</label></p>
+							<p><label><input type="checkbox" name="reactions[enable_count]" <?php checked( $this->enable_count(), true ) ?>><span class="description"><?php _e( 'Show reactions count.', 'reactions' ) ?></span></label></p>
 						</td>
 					</tr>
 					<tr>
@@ -323,16 +323,16 @@ class DW_Reaction {
 				<hr>
 				<h3><?php _e( '2. Manually insert into your theme.', 'reactions' ) ?></h3>
 				<p>
-					<ol>
-						<li><?php _e( 'Open <code>wp-content/themes/&lt;Your theme folder&gt;/</code>', 'reactions' ); ?></li>
-						<li><?php _e( 'You may place it in <code>archive.php</code>, <code>single.php</code>, <code>post.php</code> or <code>page.php</code> also.', 'reactions' ); ?></li>
-						<li><?php _e( 'Find <code>&lt;&#63;php while (have_posts()) : the_post(); &#63;&gt;</code>', 'reactions' ); ?></li>
-						<li><?php _e( "Add Anywhere Below it (The place you want Reactions to show): <code>&lt;&#63;php if (function_exists('dw_reactions')) { dw_reactions() } &#63;&gt;</code>", 'reactions' ); ?></li>
-					</ol>
-					<ul>
-						<li><?php _e( '- If you DO NOT want the reactions to appear in every post/page, DO NOT use the code above. Just type in <code>[reactions]</code> into the selected post/page and it will embed reactions into that post/page only.', 'reactions' ); ?></li>
-						<li><?php _e( '- If you want to embed other post reactions user <code>[reactions id="1"]</code>, where 1 is the ID of the post/page reactions that you want to display.', 'reactions' ); ?></li>
-					</ul>
+
+					<p><?php _e( '1. Open <code>wp-content/themes/&lt;Your theme folder&gt;/</code>.', 'reactions' ); ?></p>
+					<p><?php _e( '2. You may place it in <code>archive.php</code>, <code>single.php</code>, <code>post.php</code> or <code>page.php</code> also.', 'reactions' ); ?></p>
+					<p><?php _e( '3. Find <code>&lt;&#63;php while (have_posts()) : the_post(); &#63;&gt;</code>.', 'reactions' ); ?></p>
+					<p><?php _e( "4. Add anywhere below it (The place you want Reactions to show): <code>&lt;&#63;php if (function_exists('dw_reactions')) { dw_reactions() } &#63;&gt;</code>.", 'reactions' ); ?></p>
+					<hr>
+					<p><?php _e( 'If you DO NOT want the reactions to appear in every post/page, DO NOT use the code above. Just type in <code>[reactions]</code> into the selected post/page and it will embed reactions into that post/page only.', 'reactions' ); ?></p>
+					<p><?php _e( 'If you to use reactions button for specific post/page you can use this short code <code>[reactions id="1"]</code>, where 1 is the ID of the post/page.', 'reactions' ); ?></p>
+					<p><?php _e( 'If you want to show reactions button you can use <code>[reactions count="false" button="true"]</code>.', 'reactions' ) ?></p>
+					<p><?php _e( 'If you want to show reactions count you can use <code>[reactions count="true" button="false"]</code>.', 'reactions' ) ?></p>
 				</p>
 				<button type="submit" class="button button-primary"><?php _e( 'Save changes', 'reactions' ) ?></button>
 			</form>
@@ -464,9 +464,9 @@ class DW_Reaction {
 *
 * @param int $post_id (default: false)
 */
-function dw_reactions( $post_id = false ) {
+function dw_reactions( $post_id = false, $button = true, $count = true ) {
 	$reactions = new DW_Reaction();
-	echo $reactions->layout( $post_id );
+	echo $reactions->layout( $post_id, $button, $count );
 }
 
 /**
