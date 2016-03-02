@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Reactions\n"
-"POT-Creation-Date: 2016-03-02 14:12+0700\n"
+"POT-Creation-Date: 2016-03-02 16:37+0700\n"
 "PO-Revision-Date: 2016-03-02 14:01+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -56,7 +56,6 @@ msgstr ""
 msgid "Reactions Settings"
 msgstr ""
 
-#. Plugin Name of the plugin/theme
 #: reactions.php:301
 msgid "Reactions"
 msgstr ""
@@ -167,8 +166,12 @@ msgstr ""
 msgid "Save changes"
 msgstr ""
 
+#. Plugin Name of the plugin/theme
+msgid "DW Reactions"
+msgstr ""
+
 #. Plugin URI of the plugin/theme
-msgid "https://wordpress.org/plugins/reactions/"
+msgid "https://wordpress.org/plugins/dw-reactions/"
 msgstr ""
 
 #. Description of the plugin/theme

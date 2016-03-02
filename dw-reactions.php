@@ -1,7 +1,7 @@
 <?php
 /*
-* Plugin Name: Reactions
-* Plugin URI: https://wordpress.org/plugins/reactions/
+* Plugin Name: DW Reactions
+* Plugin URI: https://wordpress.org/plugins/dw-reactions/
 * Description: A simple plugin that helps you integrate reaction buttons into your WordPress site look like Facebook.
 * Author: DesignWall
 * Author URI: https://www.designwal.com/
