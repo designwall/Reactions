@@ -6,8 +6,6 @@ More information can be found at [designwall.com](https://www.designwall.com/).
 
 ## Installation ##
 
-For detailed setup instructions, visit the official [Documentation](https://www.designwall.com/guide/dw-question-answer-plugin/) page.
-
 1. You can clone the GitHub repository: `https://github.com/designwall/reactions.git`
 2. Or download it directly as a ZIP file: `https://github.com/designwall/reactions/archive/master.zip`
 
