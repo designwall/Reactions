@@ -1,10 +1,10 @@
 <?php
 /*
 * Plugin Name: Reactions
-* Plugin URI: http://www.designwal.com/
+* Plugin URI: https://wordpress.org/plugins/reactions/
 * Description: A simple plugin that helps you integrate reaction buttons into your WordPress site look like Facebook.
 * Author: DesignWall
-* Author URI: http://www.designwal.com/
+* Author URI: https://www.designwal.com/
 *
 * Version: 1.0.0
 * Text Domain: reactions
@@ -15,28 +15,28 @@ class DW_Reaction {
 	* Class Construct
 	*/
 	public function __construct() {
-		add_action( 'init', array( $this, 'init' ) );
-
 		// register shortcode
 		add_shortcode( 'reactions', array( $this, 'shortcode_reactions' ) );
 		add_shortcode( 'reactions_count', array( $this, 'shortcode_reactions_count' ) );
 		register_activation_hook( __FILE__, array( $this, 'set_default_setting' ) );
-	}
-
-	/**
-	* Class Init
-	*/
-	public function init() {
-		// Load translate text domain
-		load_plugin_textdomain( 'reactions', false,  plugin_basename( dirname( __FILE__ ) )  . '/languages' );
 
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_script' ) );
 		add_action( 'wp_head', array( $this, 'head' ) );
 		add_action( 'admin_menu', array( $this, 'settings_page' ) );
 		add_action( 'admin_init', array( $this, 'save' ) );
 
+		add_action( 'plugins_loaded', array( $this, 'load_translate' ) );
+
 		// ajax action
 		add_action( 'wp_ajax_dw_reaction_save_action', array( $this, 'ajax' ) );
+	}
+
+	/**
+	* Load translate
+	*/
+	public function load_translate() {
+		// Load translate text domain
+		load_plugin_textdomain( 'reactions', false,  plugin_basename( dirname( __FILE__ ) )  . '/languages' );
 	}
 
 	public function set_default_setting() {
@@ -105,28 +105,29 @@ class DW_Reaction {
 		$is_liked = $this->is_liked( get_current_user_id(), get_the_ID() );
 		$type = $is_liked ? 'unvote' : 'vote';
 
-		if ( is_user_logged_in() ) :
+
 		?>
 		<div class="dw-reactions dw-reactions-post-<?php the_ID() ?>">
 			<?php if ( $button ) : ?>
-			<div class="dw-reactions-button">
-				<span class="dw-reactions-main-button <?php echo strtolower( $is_liked ) ?>" data-type="<?php echo $type ?>"><?php echo $text ?></span>
-				<div class="dw-reactions-box" data-nonce="<?php echo wp_create_nonce( '_dw_reaction_action' ) ?>" data-post="<?php the_ID() ?>">
-					<span class="dw-reaction dw-reaction-like"><strong><?php _e( 'Like', 'reactions' ) ?></strong></span>
-					<span class="dw-reaction dw-reaction-love"><strong><?php _e( 'Love', 'reactions' ) ?></strong></span>
-					<span class="dw-reaction dw-reaction-haha"><strong><?php _e( 'Haha', 'reactions' ) ?></strong></span>
-					<span class="dw-reaction dw-reaction-wow"><strong><?php _e( 'Wow', 'reactions' ) ?></strong></span>
-					<span class="dw-reaction dw-reaction-sad"><strong><?php _e( 'Sad', 'reactions' ) ?></strong></span>
-					<span class="dw-reaction dw-reaction-angry"><strong><?php _e( 'Angry', 'reactions' ) ?></strong></span>
+				<?php if ( is_user_logged_in() ) : ?>
+				<div class="dw-reactions-button">
+					<span class="dw-reactions-main-button <?php echo strtolower( $is_liked ) ?>" data-type="<?php echo $type ?>"><?php echo $text ?></span>
+					<div class="dw-reactions-box" data-nonce="<?php echo wp_create_nonce( '_dw_reaction_action' ) ?>" data-post="<?php the_ID() ?>">
+						<span class="dw-reaction dw-reaction-like"><strong><?php _e( 'Like', 'reactions' ) ?></strong></span>
+						<span class="dw-reaction dw-reaction-love"><strong><?php _e( 'Love', 'reactions' ) ?></strong></span>
+						<span class="dw-reaction dw-reaction-haha"><strong><?php _e( 'Haha', 'reactions' ) ?></strong></span>
+						<span class="dw-reaction dw-reaction-wow"><strong><?php _e( 'Wow', 'reactions' ) ?></strong></span>
+						<span class="dw-reaction dw-reaction-sad"><strong><?php _e( 'Sad', 'reactions' ) ?></strong></span>
+						<span class="dw-reaction dw-reaction-angry"><strong><?php _e( 'Angry', 'reactions' ) ?></strong></span>
+					</div>
 				</div>
-			</div>
+				<?php endif; ?>
 			<?php endif; ?>
 			<?php if ( ( $this->enable_count() && $this->is_enable() ) || ( !$this->is_enable() && $count ) ) : ?>
 				<?php $this->count_like_layout( $post_id ); ?>
 			<?php endif; ?>
 		</div>
 		<?php
-		endif;
 	}
 
 	/**
