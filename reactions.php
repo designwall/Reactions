@@ -16,6 +16,10 @@ class DW_Reaction {
 	*/
 	public function __construct() {
 		add_action( 'init', array( $this, 'init' ) );
+
+		// register shortcode
+		add_shortcode( 'reactions', array( $this, 'shortcode_reactions' ) );
+		add_shortcode( 'reactions_count', array( $this, 'shortcode_reactions_count' ) );
 	}
 
 	/**
@@ -29,10 +33,6 @@ class DW_Reaction {
 		add_action( 'wp_head', array( $this, 'head' ) );
 		add_action( 'admin_menu', array( $this, 'settings_page' ) );
 		add_action( 'admin_init', array( $this, 'save' ) );
-
-		// register shortcode
-		add_shortcode( 'reactions', array( $this, 'shortcode' ) );
-		add_shortcode( 'reactions_count', array( $this, 'shortcode_reactions_count' ) );
 
 		// ajax action
 		add_action( 'wp_ajax_dw_reaction_save_action', array( $this, 'ajax' ) );
@@ -101,7 +101,7 @@ class DW_Reaction {
 				</div>
 			</div>
 			<?php endif; ?>
-			<?php if ( ( $this->enable_count() && $this->is_enable() ) || ( $this->is_enable() && $count ) ) : ?>
+			<?php if ( ( $this->enable_count() && $this->is_enable() ) || ( !$this->is_enable() && $count ) ) : ?>
 				<?php $this->count_like_layout( $post_id ); ?>
 			<?php endif; ?>
 		</div>
@@ -250,9 +250,12 @@ class DW_Reaction {
 	public function shortcode_reactions( $atts = array() ) {
 		extract( shortcode_atts( array(
 			'id' => get_the_ID(),
-			'button' => true,
-			'count'	=> true,
+			'button' => 'true',
+			'count'	=> 'true',
 		), $atts, 'reactions' ) );
+
+		$button = 'true' == $button ? true : false;
+		$count = 'true' == $count ? true : false;
 
 		echo $this->layout( $id, $button, $count );
 	}
@@ -331,8 +334,8 @@ class DW_Reaction {
 					<hr>
 					<p><?php _e( 'If you DO NOT want the reactions to appear in every post/page, DO NOT use the code above. Just type in <code>[reactions]</code> into the selected post/page and it will embed reactions into that post/page only.', 'reactions' ); ?></p>
 					<p><?php _e( 'If you to use reactions button for specific post/page you can use this short code <code>[reactions id="1"]</code>, where 1 is the ID of the post/page.', 'reactions' ); ?></p>
-					<p><?php _e( 'If you want to show reactions button you can use <code>[reactions count="false" button="true"]</code>.', 'reactions' ) ?></p>
-					<p><?php _e( 'If you want to show reactions count you can use <code>[reactions count="true" button="false"]</code>.', 'reactions' ) ?></p>
+					<p><?php _e( 'If you want to show reactions button you can use <code>[reactions count=false button=true]</code>.', 'reactions' ) ?></p>
+					<p><?php _e( 'If you want to show reactions count you can use <code>[reactions count=true button=false]</code>.', 'reactions' ) ?></p>
 				</p>
 				<button type="submit" class="button button-primary"><?php _e( 'Save changes', 'reactions' ) ?></button>
 			</form>
