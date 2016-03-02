@@ -38,7 +38,13 @@ We provide support both on support forum on WordPress.org and our [support page]
 
 Emotion icons by [EmojiOne](http://emojione.com/), License: [Creative Commons (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/)
 
-== Usage ==
+== Installation ==
+
+1. Upload `reactions` to the `/wp-content/plugins/` directory
+2. Activate the plugin through the 'Plugins' menu in WordPress
+3. Log In to your WordPress Dashboard and go to menu `Dashboard > Settings > Reactions`.
+
+= Usage =
 
 1. Open `wp-content/themes/<Your theme folder>/`.
 2. You may place it in `archive.php`, `single.php`, `post.php` or `page.php` also.
