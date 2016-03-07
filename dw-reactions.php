@@ -111,14 +111,14 @@ class DW_Reaction {
 			<?php if ( $button ) : ?>
 				<?php if ( is_user_logged_in() ) : ?>
 				<div class="dw-reactions-button">
-					<span class="dw-reactions-main-button <?php echo strtolower( $is_liked ) ?>" data-type="<?php echo $type ?>"><?php echo $text ?></span>
+					<span class="dw-reactions-main-button <?php echo esc_attr( strtolower( $is_liked ) ) ?>" data-type="<?php echo esc_attr( $type ) ?>"><?php echo esc_html( $text ) ?></span>
 					<div class="dw-reactions-box" data-nonce="<?php echo wp_create_nonce( '_dw_reaction_action' ) ?>" data-post="<?php the_ID() ?>">
-						<span class="dw-reaction dw-reaction-like"><strong><?php _e( 'Like', 'reactions' ) ?></strong></span>
-						<span class="dw-reaction dw-reaction-love"><strong><?php _e( 'Love', 'reactions' ) ?></strong></span>
-						<span class="dw-reaction dw-reaction-haha"><strong><?php _e( 'Haha', 'reactions' ) ?></strong></span>
-						<span class="dw-reaction dw-reaction-wow"><strong><?php _e( 'Wow', 'reactions' ) ?></strong></span>
-						<span class="dw-reaction dw-reaction-sad"><strong><?php _e( 'Sad', 'reactions' ) ?></strong></span>
-						<span class="dw-reaction dw-reaction-angry"><strong><?php _e( 'Angry', 'reactions' ) ?></strong></span>
+						<span class="dw-reaction dw-reaction-like"><strong><?php esc_attr_e( 'Like', 'reactions' ) ?></strong></span>
+						<span class="dw-reaction dw-reaction-love"><strong><?php esc_attr_e( 'Love', 'reactions' ) ?></strong></span>
+						<span class="dw-reaction dw-reaction-haha"><strong><?php esc_attr_e( 'Haha', 'reactions' ) ?></strong></span>
+						<span class="dw-reaction dw-reaction-wow"><strong><?php esc_attr_e( 'Wow', 'reactions' ) ?></strong></span>
+						<span class="dw-reaction dw-reaction-sad"><strong><?php esc_attr_e( 'Sad', 'reactions' ) ?></strong></span>
+						<span class="dw-reaction dw-reaction-angry"><strong><?php esc_attr_e( 'Angry', 'reactions' ) ?></strong></span>
 					</div>
 				</div>
 				<?php endif; ?>
@@ -146,7 +146,7 @@ class DW_Reaction {
 			$count = get_post_meta( $post_id, 'dw_reaction_' . $reaction );
 
 			if ( !empty( $count ) ) {
-				echo '<span class="dw-reaction-count dw-reaction-count-'.$reaction.'"><strong>'.count( $count ).'</strong></span>';
+				echo '<span class="dw-reaction-count dw-reaction-count-'.esc_attr( $reaction ).'"><strong>'.esc_attr( count( $count ) ).'</strong></span>';
 			}
 		}
 		echo '</div>';
@@ -171,45 +171,49 @@ class DW_Reaction {
 	public function ajax() {
 		check_admin_referer( '_dw_reaction_action', 'nonce' );
 
-		if ( empty( $_POST['post'] ) ) {
-			wp_send_json_error( array( 'message' => __( 'Missing post', 'reactions' ) ) );
+		$post_id = intval( $_POST['post'] );
+		$type = sanitize_title( $_POST['type'] );
+
+		if ( empty( $post_id ) ) {
+			wp_send_json_error( array( 'message' => __( 'Missing post.', 'reactions' ) ) );
 		}
 
-		if ( empty( $_POST['type'] ) ) {
-			wp_send_json_error( array( 'message' => __( 'Missing type', 'reactions' ) ) );
+		if ( empty( $type ) ) {
+			wp_send_json_error( array( 'message' => __( 'Missing type.', 'reactions' ) ) );
 		}
 
 		// delete old reactions
-		$is_liked = $this->is_liked( get_current_user_id(), $_POST['post'] );
+		$is_liked = $this->is_liked( get_current_user_id(), $post_id );
 		if ( $is_liked ) {
-			delete_post_meta( $_POST['post'], $is_liked, get_current_user_id() );
-			if ( isset( $_POST['vote_type'] ) && 'unvote' == $_POST['vote_type'] ) {
-				$total = get_post_meta( $_POST['post'], 'dw_reaction_total_liked', true ) ? get_post_meta( $_POST['post'], 'dw_reaction_total_liked', true ) : 0;
+			delete_post_meta( $post_id, $is_liked, get_current_user_id() );
+			$vote_type = sanitize_title( $_POST['vote_type' ] );
+			if ( isset( $vote_type ) && 'unvote' == $vote_type ) {
+				$total = get_post_meta( $post_id, 'dw_reaction_total_liked', true ) ? get_post_meta( $post_id, 'dw_reaction_total_liked', true ) : 0;
 				if ( $total >= 0 ) {
 					$total = (int) $total - 1;
-					update_post_meta( $_POST['post'], 'dw_reaction_total_liked', $total );
+					update_post_meta( $post_id, 'dw_reaction_total_liked', $total );
 				}
 				ob_start();
-				$this->count_like_layout( $_POST['post'] );
+				$this->count_like_layout( $post_id );
 				$content = ob_get_clean();
 				wp_send_json_success( array( 'html' => $content, 'type' => 'unvoted' ) );
 			}
 		}
 
 		if ( !$is_liked ) {
-			$total = get_post_meta( $_POST['post'], 'dw_reaction_total_liked', true ) ? get_post_meta( $_POST['post'], 'dw_reaction_total_liked', true ) : 0;
+			$total = get_post_meta( $post_id, 'dw_reaction_total_liked', true ) ? get_post_meta( $post_id, 'dw_reaction_total_liked', true ) : 0;
 			$total = (int) $total + 1;
 
-			update_post_meta( $_POST['post'], 'dw_reaction_total_liked', $total );
+			update_post_meta( $post_id, 'dw_reaction_total_liked', $total );
 		}
 
-		$count = get_post_meta( $_POST['post'], 'dw_reaction_' . $_POST['type'] );
+		$count = get_post_meta( $post_id, 'dw_reaction_' . $type );
 
 		// update to database
-		add_post_meta( $_POST['post'], 'dw_reaction_' . $_POST['type'], get_current_user_id() );
+		add_post_meta( $post_id, 'dw_reaction_' . $type, get_current_user_id() );
 
 		ob_start();
-		$this->count_like_layout( $_POST['post'] );
+		$this->count_like_layout( $post_id );
 		$content = ob_get_clean();
 
 		wp_send_json_success( array( 'html' => $content, 'type' => 'voted' ) );
@@ -315,50 +319,50 @@ class DW_Reaction {
 		?>
 		<div class="wrap">
 			<h2><?php echo get_admin_page_title(); ?></h2>
-			<?php _e( 'To display the reactions button on your blog posts, you can use one of two ways below:', 'reactions' ); ?>
+			<?php esc_attr_e( 'To display the reactions button on your blog posts, you can use one of two ways below:', 'reactions' ); ?>
 			<form method="post">
-				<h3><?php _e( '1. Automatically display on the content of each post.', 'reactions' ) ?></h3>
+				<h3><?php esc_attr_e( '1. Automatically display on the content of each post.', 'reactions' ) ?></h3>
 				<table class="form-table">
 					<tr>
 						<td>
 							<p><label>
-								<input type="checkbox" name="reactions[enable]" <?php checked( $this->is_enable(), true ) ?>><span class="description"><?php _e( 'Show reactions button.', 'reactions' ) ?></span>
+								<input type="checkbox" name="reactions[enable]" <?php checked( $this->is_enable(), true ) ?>><span class="description"><?php esc_attr_e( 'Show reactions button.', 'reactions' ) ?></span>
 							</label></p>
-							<p><label><input type="checkbox" name="reactions[enable_count]" <?php checked( $this->enable_count(), true ) ?>><span class="description"><?php _e( 'Show reactions count.', 'reactions' ) ?></span></label></p>
+							<p><label><input type="checkbox" name="reactions[enable_count]" <?php checked( $this->enable_count(), true ) ?>><span class="description"><?php esc_attr_e( 'Show reactions count.', 'reactions' ) ?></span></label></p>
 						</td>
 					</tr>
 					<tr>
-						<th><?php _e( 'Positions', 'reactions' ); ?></th>
+						<th><?php esc_attr_e( 'Positions', 'reactions' ); ?></th>
 						<td>
-							<p><label><input type="checkbox" name="reactions[position][above]" <?php checked( $above, 'on' ) ?>><span class="description"><?php _e( 'Show the reactions button above the post content.', 'reactions' ) ?></span></label></p>
-							<p><label><input type="checkbox" name="reactions[position][below]" <?php checked( $below, 'on' ) ?>><span class="description"><?php _e( 'Show the reactions button below the post content.', 'reactions' ) ?></span></label></p>
+							<p><label><input type="checkbox" name="reactions[position][above]" <?php checked( esc_attr( $above ), 'on' ) ?>><span class="description"><?php esc_attr_e( 'Show the reactions button above the post content.', 'reactions' ) ?></span></label></p>
+							<p><label><input type="checkbox" name="reactions[position][below]" <?php checked( esc_attr( $below ), 'on' ) ?>><span class="description"><?php esc_attr_e( 'Show the reactions button below the post content.', 'reactions' ) ?></span></label></p>
 						</td>
 					</tr>
 					<tr>
-						<th><?php _e( 'Pages', 'reactions' ) ?></th>
+						<th><?php esc_attr_e( 'Pages', 'reactions' ) ?></th>
 						<td>
-							<p><label><input type="checkbox" name="reactions[pages][home]"<?php checked( $home, 'on' ) ?>><span class="description" ><?php _e( 'Show on Homepage', 'reactions' ) ?></span></label></p>
-							<p><label><input type="checkbox" name="reactions[pages][archive]" <?php checked( $archive, 'on' ) ?>><span class="description"><?php _e( 'Show on Archive pages', 'reactions' ) ?></span></label></p>
-							<p><label><input type="checkbox" name="reactions[pages][posts]"<?php checked( $posts, 'on' ) ?>><span class="description"><?php _e( 'Show on all Posts', 'reactions' ) ?></span></label></p>
-							<p><label><input type="checkbox" name="reactions[pages][pages]"<?php checked( $pages, 'on' ) ?>><span class="description" ><?php _e( 'Show on all Pages', 'reactions' ) ?></span></label></p>
+							<p><label><input type="checkbox" name="reactions[pages][home]"<?php checked( esc_attr( $home ), 'on' ) ?>><span class="description" ><?php esc_attr_e( 'Show on Homepage', 'reactions' ) ?></span></label></p>
+							<p><label><input type="checkbox" name="reactions[pages][archive]" <?php checked( esc_attr( $archive ), 'on' ) ?>><span class="description"><?php esc_attr_e( 'Show on Archive pages', 'reactions' ) ?></span></label></p>
+							<p><label><input type="checkbox" name="reactions[pages][posts]"<?php checked( esc_attr( $posts ), 'on' ) ?>><span class="description"><?php esc_attr_e( 'Show on all Posts', 'reactions' ) ?></span></label></p>
+							<p><label><input type="checkbox" name="reactions[pages][pages]"<?php checked( esc_attr( $pages ), 'on' ) ?>><span class="description" ><?php esc_attr_e( 'Show on all Pages', 'reactions' ) ?></span></label></p>
 						</td>
 					</tr>
 				</table>
 				<hr>
-				<h3><?php _e( '2. Manually insert into your theme.', 'reactions' ) ?></h3>
+				<h3><?php esc_attr_e( '2. Manually insert into your theme.', 'reactions' ) ?></h3>
 				<p>
 
-					<p><?php _e( '1. Open <code>wp-content/themes/&lt;Your theme folder&gt;/</code>.', 'reactions' ); ?></p>
-					<p><?php _e( '2. You may place it in <code>archive.php</code>, <code>single.php</code>, <code>post.php</code> or <code>page.php</code> also.', 'reactions' ); ?></p>
-					<p><?php _e( '3. Find <code>&lt;&#63;php while (have_posts()) : the_post(); &#63;&gt;</code>.', 'reactions' ); ?></p>
-					<p><?php _e( "4. Add anywhere below it (The place you want Reactions to show): <code>&lt;&#63;php if (function_exists('dw_reactions')) { dw_reactions() } &#63;&gt;</code>.", 'reactions' ); ?></p>
+					<p><?php esc_attr_e( '1. Open <code>wp-content/themes/&lt;Your theme folder&gt;/</code>.', 'reactions' ); ?></p>
+					<p><?php esc_attr_e( '2. You may place it in <code>archive.php</code>, <code>single.php</code>, <code>post.php</code> or <code>page.php</code> also.', 'reactions' ); ?></p>
+					<p><?php esc_attr_e( '3. Find <code>&lt;&#63;php while (have_posts()) : the_post(); &#63;&gt;</code>.', 'reactions' ); ?></p>
+					<p><?php esc_attr_e( "4. Add anywhere below it (The place you want Reactions to show): <code>&lt;&#63;php if (function_exists('dw_reactions')) { dw_reactions() } &#63;&gt;</code>.", 'reactions' ); ?></p>
 					<hr>
-					<p><?php _e( 'If you DO NOT want the reactions to appear in every post/page, DO NOT use the code above. Just type in <code>[reactions]</code> into the selected post/page and it will embed reactions into that post/page only.', 'reactions' ); ?></p>
-					<p><?php _e( 'If you to use reactions button for specific post/page you can use this short code <code>[reactions id="1"]</code>, where 1 is the ID of the post/page.', 'reactions' ); ?></p>
-					<p><?php _e( 'If you want to show reactions button you can use <code>[reactions count=false button=true]</code>.', 'reactions' ) ?></p>
-					<p><?php _e( 'If you want to show reactions count you can use <code>[reactions count=true button=false]</code>.', 'reactions' ) ?></p>
+					<p><?php esc_attr_e( 'If you DO NOT want the reactions to appear in every post/page, DO NOT use the code above. Just type in <code>[reactions]</code> into the selected post/page and it will embed reactions into that post/page only.', 'reactions' ); ?></p>
+					<p><?php esc_attr_e( 'If you to use reactions button for specific post/page you can use this short code <code>[reactions id="1"]</code>, where 1 is the ID of the post/page.', 'reactions' ); ?></p>
+					<p><?php esc_attr_e( 'If you want to show reactions button you can use <code>[reactions count=false button=true]</code>.', 'reactions' ) ?></p>
+					<p><?php esc_attr_e( 'If you want to show reactions count you can use <code>[reactions count=true button=false]</code>.', 'reactions' ) ?></p>
 				</p>
-				<button type="submit" class="button button-primary"><?php _e( 'Save changes', 'reactions' ) ?></button>
+				<button type="submit" class="button button-primary"><?php esc_attr_e( 'Save changes', 'reactions' ) ?></button>
 			</form>
 		</div>
 		<?php
