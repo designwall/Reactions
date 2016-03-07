@@ -2,9 +2,9 @@
 msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
-"Project-Id-Version: Reactions\n"
-"POT-Creation-Date: 2016-03-02 16:37+0700\n"
-"PO-Revision-Date: 2016-03-02 14:01+0700\n"
+"Project-Id-Version: DW Reactions\n"
+"POT-Creation-Date: 2016-03-07 09:30+0700\n"
+"PO-Revision-Date: 2016-03-07 09:30+0700\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.8.6\n"
 "X-Poedit-Basepath: ..\n"
-"X-Poedit-WPHeader: reactions.php\n"
+"X-Poedit-WPHeader: dw-reactions.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
 "esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
@@ -20,149 +20,149 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
-#: reactions.php:116 reactions.php:246
+#: dw-reactions.php:116 dw-reactions.php:250
 msgid "Like"
 msgstr ""
 
-#: reactions.php:117 reactions.php:255
+#: dw-reactions.php:117 dw-reactions.php:259
 msgid "Love"
 msgstr ""
 
-#: reactions.php:118 reactions.php:253
+#: dw-reactions.php:118 dw-reactions.php:257
 msgid "Haha"
 msgstr ""
 
-#: reactions.php:119 reactions.php:257
+#: dw-reactions.php:119 dw-reactions.php:261
 msgid "Wow"
 msgstr ""
 
-#: reactions.php:120 reactions.php:261
+#: dw-reactions.php:120 dw-reactions.php:265
 msgid "Sad"
 msgstr ""
 
-#: reactions.php:121 reactions.php:259
+#: dw-reactions.php:121 dw-reactions.php:263
 msgid "Angry"
 msgstr ""
 
-#: reactions.php:175
-msgid "Missing post"
+#: dw-reactions.php:178
+msgid "Missing post."
 msgstr ""
 
-#: reactions.php:179
-msgid "Missing type"
+#: dw-reactions.php:182
+msgid "Missing type."
 msgstr ""
 
-#: reactions.php:301
+#: dw-reactions.php:305
 msgid "Reactions Settings"
 msgstr ""
 
-#: reactions.php:301
+#: dw-reactions.php:305
 msgid "Reactions"
 msgstr ""
 
-#: reactions.php:318
+#: dw-reactions.php:322
 msgid ""
 "To display the reactions button on your blog posts, you can use one of two "
 "ways below:"
 msgstr ""
 
-#: reactions.php:320
+#: dw-reactions.php:324
 msgid "1. Automatically display on the content of each post."
 msgstr ""
 
-#: reactions.php:325
+#: dw-reactions.php:329
 msgid "Show reactions button."
 msgstr ""
 
-#: reactions.php:327
+#: dw-reactions.php:331
 msgid "Show reactions count."
 msgstr ""
 
-#: reactions.php:331
+#: dw-reactions.php:335
 msgid "Positions"
 msgstr ""
 
-#: reactions.php:333
+#: dw-reactions.php:337
 msgid "Show the reactions button above the post content."
 msgstr ""
 
-#: reactions.php:334
+#: dw-reactions.php:338
 msgid "Show the reactions button below the post content."
 msgstr ""
 
-#: reactions.php:338
+#: dw-reactions.php:342
 msgid "Pages"
 msgstr ""
 
-#: reactions.php:340
+#: dw-reactions.php:344
 msgid "Show on Homepage"
 msgstr ""
 
-#: reactions.php:341
+#: dw-reactions.php:345
 msgid "Show on Archive pages"
 msgstr ""
 
-#: reactions.php:342
+#: dw-reactions.php:346
 msgid "Show on all Posts"
 msgstr ""
 
-#: reactions.php:343
+#: dw-reactions.php:347
 msgid "Show on all Pages"
 msgstr ""
 
-#: reactions.php:348
+#: dw-reactions.php:352
 msgid "2. Manually insert into your theme."
 msgstr ""
 
-#: reactions.php:351
+#: dw-reactions.php:355
 msgid "1. Open <code>wp-content/themes/&lt;Your theme folder&gt;/</code>."
 msgstr ""
 
-#: reactions.php:352
+#: dw-reactions.php:356
 msgid ""
 "2. You may place it in <code>archive.php</code>, <code>single.php</code>, "
 "<code>post.php</code> or <code>page.php</code> also."
 msgstr ""
 
-#: reactions.php:353
+#: dw-reactions.php:357
 msgid ""
 "3. Find <code>&lt;&#63;php while (have_posts()) : the_post(); &#63;&gt;</"
 "code>."
 msgstr ""
 
-#: reactions.php:354
+#: dw-reactions.php:358
 msgid ""
 "4. Add anywhere below it (The place you want Reactions to show): <code>&lt;"
 "&#63;php if (function_exists('dw_reactions')) { dw_reactions() } &#63;&gt;</"
 "code>."
 msgstr ""
 
-#: reactions.php:356
+#: dw-reactions.php:360
 msgid ""
 "If you DO NOT want the reactions to appear in every post/page, DO NOT use "
 "the code above. Just type in <code>[reactions]</code> into the selected post/"
 "page and it will embed reactions into that post/page only."
 msgstr ""
 
-#: reactions.php:357
+#: dw-reactions.php:361
 msgid ""
 "If you to use reactions button for specific post/page you can use this short "
 "code <code>[reactions id=\"1\"]</code>, where 1 is the ID of the post/page."
 msgstr ""
 
-#: reactions.php:358
+#: dw-reactions.php:362
 msgid ""
 "If you want to show reactions button you can use <code>[reactions "
 "count=false button=true]</code>."
 msgstr ""
 
-#: reactions.php:359
+#: dw-reactions.php:363
 msgid ""
 "If you want to show reactions count you can use <code>[reactions count=true "
 "button=false]</code>."
 msgstr ""
 
-#: reactions.php:361
+#: dw-reactions.php:365
 msgid "Save changes"
 msgstr ""
 
