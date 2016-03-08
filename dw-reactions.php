@@ -2,7 +2,7 @@
 /*
 * Plugin Name: DW Reactions
 * Plugin URI: https://wordpress.org/plugins/dw-reactions/
-* Description: A simple plugin that helps you integrate reaction buttons into your WordPress site look like Facebook.
+* Description: A simple plugin that helps you integrate reactions buttons into your WordPress site look like Facebook.
 * Author: DesignWall
 * Author URI: https://www.designwal.com/
 *
@@ -29,6 +29,7 @@ class DW_Reaction {
 
 		// ajax action
 		add_action( 'wp_ajax_dw_reaction_save_action', array( $this, 'ajax' ) );
+		add_action( 'wp_ajax_nopriv_dw_reaction_save_action', array( $this, 'ajax' ) );
 	}
 
 	/**
@@ -41,17 +42,18 @@ class DW_Reaction {
 
 	public function set_default_setting() {
 		$data = array(
-			'enable' 		=> 'on',
-			'enable_count' 	=> 'on',
-			'position'		=> array(
-				'above' 	=> 'on',
-				'below' 	=> 'on',
+			'enable' 				=> 'on',
+			'enable_count' 			=> 'on',
+			'anonymous_can_vote' 	=> 'on',
+			'position'				=> array(
+				'above' 			=> 'on',
+				'below' 			=> 'on',
 			),
-			'pages' 		=> array(
-				'home' 		=> 'on',
-				'archive' 	=> 'on',
-				'posts' 	=> 'on',
-				'pages' 	=> 'on'
+			'pages' 				=> array(
+				'home' 				=> 'on',
+				'archive' 			=> 'on',
+				'posts' 			=> 'on',
+				'pages' 			=> 'on'
 			)
 		);
 
@@ -105,11 +107,10 @@ class DW_Reaction {
 		$is_liked = $this->is_liked( get_current_user_id(), get_the_ID() );
 		$type = $is_liked ? 'unvote' : 'vote';
 
-
 		?>
 		<div class="dw-reactions dw-reactions-post-<?php the_ID() ?>">
 			<?php if ( $button ) : ?>
-				<?php if ( is_user_logged_in() ) : ?>
+				<?php if ( !$this->anonymous_can_vote() ) : ?>
 				<div class="dw-reactions-button">
 					<span class="dw-reactions-main-button <?php echo esc_attr( strtolower( $is_liked ) ) ?>" data-type="<?php echo esc_attr( $type ) ?>"><?php echo esc_html( $text ) ?></span>
 					<div class="dw-reactions-box" data-nonce="<?php echo wp_create_nonce( '_dw_reaction_action' ) ?>" data-post="<?php the_ID() ?>">
@@ -158,6 +159,7 @@ class DW_Reaction {
 	public function enqueue_script() {
 		wp_enqueue_style( 'dw-reaction-style', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'assets/css/style.css' );
 		wp_enqueue_script( 'dw-reaction-script', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'assets/js/script.js', array( 'jquery' ), true );
+		wp_enqueue_script( 'jquery_mobile', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'assets/js/jquery.mobile-1.4.5.min.js', array( 'jquery' ), '1.4.5' );
 		$localize = array(
 			'ajax' => admin_url( 'admin-ajax.php' ),
 		);
@@ -173,6 +175,7 @@ class DW_Reaction {
 
 		$post_id = intval( $_POST['post'] );
 		$type = sanitize_title( $_POST['type'] );
+		$vote_type = sanitize_title( $_POST['vote_type' ] );
 
 		if ( empty( $post_id ) ) {
 			wp_send_json_error( array( 'message' => __( 'Missing post.', 'reactions' ) ) );
@@ -182,11 +185,12 @@ class DW_Reaction {
 			wp_send_json_error( array( 'message' => __( 'Missing type.', 'reactions' ) ) );
 		}
 
+		if ( 'unvote' == $vote_type && !is_user_logged_in() ) return;
 		// delete old reactions
 		$is_liked = $this->is_liked( get_current_user_id(), $post_id );
 		if ( $is_liked ) {
+			if ( !is_user_logged_in() ) return;
 			delete_post_meta( $post_id, $is_liked, get_current_user_id() );
-			$vote_type = sanitize_title( $_POST['vote_type' ] );
 			if ( isset( $vote_type ) && 'unvote' == $vote_type ) {
 				$total = get_post_meta( $post_id, 'dw_reaction_total_liked', true ) ? get_post_meta( $post_id, 'dw_reaction_total_liked', true ) : 0;
 				if ( $total >= 0 ) {
@@ -209,8 +213,13 @@ class DW_Reaction {
 
 		$count = get_post_meta( $post_id, 'dw_reaction_' . $type );
 
+		$user_id = get_current_user_id();
+		if ( !is_user_logged_in() && !$this->anonymous_can_vote() ) {
+			$user_id = 'anonymous';
+		}
+
 		// update to database
-		add_post_meta( $post_id, 'dw_reaction_' . $type, get_current_user_id() );
+		add_post_meta( $post_id, 'dw_reaction_' . $type, $user_id );
 
 		ob_start();
 		$this->count_like_layout( $post_id );
@@ -228,7 +237,7 @@ class DW_Reaction {
 	public function is_liked( $user_id, $post_id = false ) {
 		global $wpdb;
 
-		$query = "SELECT meta_key FROM {$wpdb->postmeta} WHERE meta_key IN ( 'dw_reaction_love', 'dw_reaction_like', 'dw_reaction_haha', 'dw_reaction_wow', 'dw_reaction_sad', 'dw_reaction_angry' ) AND meta_value = {$user_id}";
+		$query = "SELECT meta_key FROM {$wpdb->postmeta} WHERE meta_key IN ( 'dw_reaction_love', 'dw_reaction_like', 'dw_reaction_haha', 'dw_reaction_wow', 'dw_reaction_sad', 'dw_reaction_angry' ) AND meta_value = '{$user_id}'";
 
 		if ( $post_id ) {
 			$query .= " AND post_id = {$post_id}";
@@ -324,11 +333,16 @@ class DW_Reaction {
 				<h3><?php esc_attr_e( '1. Automatically display on the content of each post.', 'reactions' ) ?></h3>
 				<table class="form-table">
 					<tr>
-						<td>
+						<td colspan="2">
 							<p><label>
 								<input type="checkbox" name="reactions[enable]" <?php checked( $this->is_enable(), true ) ?>><span class="description"><?php esc_attr_e( 'Show reactions button.', 'reactions' ) ?></span>
 							</label></p>
 							<p><label><input type="checkbox" name="reactions[enable_count]" <?php checked( $this->enable_count(), true ) ?>><span class="description"><?php esc_attr_e( 'Show reactions count.', 'reactions' ) ?></span></label></p>
+							<p>
+								<label>
+									<input type="checkbox" name="reactions[anonymous_can_vote]" <?php checked( $this->anonymous_can_vote(), true ) ?>><span class="description"><?php esc_attr_e( 'Users must be registered and logged in to add reaction.', 'reactions' ) ?></span>
+								</label>
+							</p>
 						</td>
 					</tr>
 					<tr>
@@ -378,7 +392,9 @@ class DW_Reaction {
 	}
 
 	/**
-	* Check is enable reactions
+	* Check is enable reactions buttons
+	*
+	* @return bool
 	*/
 	public function is_enable() {
 		$options = get_option( 'dw_reactions', array() );
@@ -386,10 +402,26 @@ class DW_Reaction {
 		return isset( $options['enable'] ) && 'on' == $options['enable'] ? true : false;
 	}
 
+	/**
+	* Check is enable reactions count
+	*
+	* @return bool
+	*/
 	public function enable_count() {
 		$options = get_option( 'dw_reactions', array() );
 
 		return isset( $options['enable_count'] ) && 'on' == $options['enable_count'] ? true : false;
+	}
+
+	/**
+	* Check anonymous can vote
+	*
+	* @return bool
+	*/
+	public function anonymous_can_vote() {
+		$options = get_option( 'dw_reactions', array() );
+
+		return isset( $options['anonymous_can_vote'] ) || 'on' == $options['anonymous_can_vote'] ? true : false;
 	}
 
 	/**
@@ -491,6 +523,8 @@ class DW_Reaction {
 * Print reactions
 *
 * @param int $post_id (default: false)
+* @param bool $button (default: true)
+* @param bool $count (default: true)
 */
 function dw_reactions( $post_id = false, $button = true, $count = true ) {
 	$reactions = new DW_Reaction();

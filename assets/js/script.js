@@ -34,7 +34,7 @@ jQuery(document).ready(function($){
 	$('.dw-reaction').on('click', function(e){
 		e.preventDefault();
 
-		var t = $(this), $class = $(this).attr('class'), parent = t.parent(), text = t.find('strong').text();
+		var t = $(this), $class = $(this).attr('class'), parent = t.parent(), text = t.find('strong').text(), vote_type = parent.parent().find('.dw-reactions-main-button').attr('data-type');
 		res = $class.split(' ');
 		type = res[1].split('-');
 
@@ -48,7 +48,8 @@ jQuery(document).ready(function($){
 				action: 'dw_reaction_save_action',
 				nonce: parent.data('nonce'),
 				type: type[2],
-				post: parent.data('post')
+				post: parent.data('post'),
+				vote_type: vote_type
 			},
 			success: function(data) {
 				if ( data.success ) {
