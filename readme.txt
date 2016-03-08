@@ -3,7 +3,7 @@ Contributors: designwall
 Tags: reactions, reaction, facebook reactions, facebook, like, emotions, votes, voting, rating, wordpress reactions
 Requires at least: 3.0
 Tested up to: 4.4.2
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -57,6 +57,9 @@ Emotion icons by [EmojiOne](http://emojione.com/), License: [Creative Commons (C
 - If you want to show reactions count you can use `[reactions count="true" button="false"]`.
 
 == Changelog ==
+
+= 1.0.1 =
+* New: Anonymous can reactions
 
 = 1.0.0 =
 * First release

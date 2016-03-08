@@ -6,7 +6,7 @@
 * Author: DesignWall
 * Author URI: https://www.designwal.com/
 *
-* Version: 1.0.0
+* Version: 1.0.1
 * Text Domain: reactions
 */
 
