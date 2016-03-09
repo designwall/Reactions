@@ -127,7 +127,7 @@ class DW_Reaction {
 		?>
 		<div class="dw-reactions dw-reactions-post-<?php the_ID() ?>" data-type="<?php echo esc_attr( $type ) ?>" data-nonce="<?php echo wp_create_nonce( '_dw_reaction_action' ) ?>" data-post="<?php the_ID() ?>">
 			<?php if ( $button ) : ?>
-				<?php if ( !$this->anonymous_can_vote() ) : ?>
+				<?php if ( ( !$this->anonymous_can_vote() && !is_user_logged_in() ) || is_user_logged_in() ) : ?>
 				<div class="dw-reactions-button">
 					<span class="dw-reactions-main-button <?php echo esc_attr( strtolower( $is_liked ) ) ?>"><?php echo esc_html( $text ) ?></span>
 					<div class="dw-reactions-box">
