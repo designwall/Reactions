@@ -34,7 +34,8 @@ jQuery(document).ready(function($){
 	$('.dw-reaction').on('click', function(e){
 		e.preventDefault();
 
-		var t = $(this), $class = $(this).attr('class'), parent = t.parent(), text = t.find('strong').text(), vote_type = parent.parent().find('.dw-reactions-main-button').attr('data-type');
+		var t = $(this), $class = t.attr('class'), main = t.parent().parent().parent(), vote_type = main.attr('data-type'), voted = main.attr('data-vote'), text = t.find('strong').text();
+		console.log(main);
 		res = $class.split(' ');
 		type = res[1].split('-');
 
@@ -46,15 +47,17 @@ jQuery(document).ready(function($){
 			type: 'POST',
 			data: {
 				action: 'dw_reaction_save_action',
-				nonce: parent.data('nonce'),
+				nonce: main.data('nonce'),
 				type: type[2],
-				post: parent.data('post'),
-				vote_type: vote_type
+				post: main.data('post'),
+				vote_type: vote_type,
+				voted: voted
 			},
 			success: function(data) {
 				if ( data.success ) {
-					$('.dw-reactions-post-'+parent.data('post')).find('.dw-reactions-count').replaceWith(data.data.html);
-					$('.dw-reactions-post-'+parent.data('post')).find('.dw-reactions-main-button').attr('class','dw-reactions-main-button').addClass('dw_reaction_'+type[2]).text(text).attr('data-type', 'unvote');
+					$('.dw-reactions-post-'+main.data('post')).find('.dw-reactions-count').html(data.data.html);
+					$('.dw-reactions-post-'+main.data('post')).find('.dw-reactions-main-button').attr('class','dw-reactions-main-button').addClass('dw_reaction_'+type[2]).text(text);
+					main.attr('data-vote','yes').attr('data-type', 'unvote');
 				}
 			}
 		});
@@ -63,8 +66,8 @@ jQuery(document).ready(function($){
 	$('.dw-reactions-main-button').on('click', function(e) {
 		e.preventDefault();
 
-		var t = $(this);
-		type = t.attr('data-type');
+		var t = $(this), parent = t.parent().parent();
+		type = parent.attr('data-type');
 		text = t.parent().find('.dw-reaction-like strong').text();
 
 		$.ajax({
@@ -73,21 +76,22 @@ jQuery(document).ready(function($){
 			type: 'POST',
 			data: {
 				action: 'dw_reaction_save_action',
-				nonce: t.next().data('nonce'),
+				nonce: parent.data('nonce'),
 				type: 'like',
-				post: t.next().data('post'),
-				vote_type: type
+				post: parent.data('post'),
+				vote_type: type,
+				voted: parent.attr('data-voted')
 			},
 			success: function(data) {
 				if ( data.success ) {
 					if ( data.data.type == 'unvoted' ) {
-						$('.dw-reactions-post-'+t.next().data('post')).find('.dw-reactions-main-button').attr('class', 'dw-reactions-main-button').text(text);
-						$('.dw-reactions-post-'+t.next().data('post')).find('.dw-reactions-main-button').attr('data-type', 'vote');
+						$('.dw-reactions-post-'+parent.data('post')).find('.dw-reactions-main-button').attr('class', 'dw-reactions-main-button').text(text);
+						parent.attr('data-type', 'vote');
 					} else {
-						$('.dw-reactions-post-'+t.next().data('post')).find('.dw-reactions-main-button').addClass('dw_reaction_like');
-						$('.dw-reactions-post-'+t.next().data('post')).find('.dw-reactions-main-button').attr('data-type', 'unvote');
+						$('.dw-reactions-post-'+parent.data('post')).find('.dw-reactions-main-button').addClass('dw_reaction_like');
+						parent.attr('data-type', 'unvote');
 					}
-					$('.dw-reactions-post-'+t.next().data('post')).find('.dw-reactions-count').replaceWith(data.data.html);
+					$('.dw-reactions-post-'+parent.data('post')).find('.dw-reactions-count').html(data.data.html);
 				}
 			}
 		});

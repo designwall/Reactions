@@ -125,12 +125,12 @@ class DW_Reaction {
 		$type = $is_liked ? 'unvote' : 'vote';
 		ob_start();
 		?>
-		<div class="dw-reactions dw-reactions-post-<?php the_ID() ?>">
+		<div class="dw-reactions dw-reactions-post-<?php the_ID() ?>" data-type="<?php echo esc_attr( $type ) ?>" data-nonce="<?php echo wp_create_nonce( '_dw_reaction_action' ) ?>" data-post="<?php the_ID() ?>">
 			<?php if ( $button ) : ?>
 				<?php if ( !$this->anonymous_can_vote() ) : ?>
 				<div class="dw-reactions-button">
-					<span class="dw-reactions-main-button <?php echo esc_attr( strtolower( $is_liked ) ) ?>" data-type="<?php echo esc_attr( $type ) ?>"><?php echo esc_html( $text ) ?></span>
-					<div class="dw-reactions-box" data-nonce="<?php echo wp_create_nonce( '_dw_reaction_action' ) ?>" data-post="<?php the_ID() ?>">
+					<span class="dw-reactions-main-button <?php echo esc_attr( strtolower( $is_liked ) ) ?>"><?php echo esc_html( $text ) ?></span>
+					<div class="dw-reactions-box">
 						<span class="dw-reaction dw-reaction-like"><strong><?php esc_attr_e( 'Like', 'reactions' ) ?></strong></span>
 						<span class="dw-reaction dw-reaction-love"><strong><?php esc_attr_e( 'Love', 'reactions' ) ?></strong></span>
 						<span class="dw-reaction dw-reaction-haha"><strong><?php esc_attr_e( 'Haha', 'reactions' ) ?></strong></span>
@@ -165,6 +165,7 @@ class DW_Reaction {
 		}
 		$reactions = array( 'like', 'love', 'haha', 'wow', 'sad', 'angry' );
 		$total = get_post_meta( $post_id, 'dw_reaction_total_liked', true );
+		$output = '';
 		foreach( $reactions as $reaction ) {
 			$count = get_post_meta( $post_id, 'dw_reaction_' . $reaction );
 
@@ -198,7 +199,8 @@ class DW_Reaction {
 
 		$post_id = intval( $_POST['post'] );
 		$type = sanitize_title( $_POST['type'] );
-		$vote_type = sanitize_title( $_POST['vote_type' ] );
+		$vote_type = sanitize_title( $_POST['vote_type'] );
+		$voted = sanitize_title( $_POST['voted'] );
 
 		if ( empty( $post_id ) ) {
 			wp_send_json_error( array( 'message' => __( 'Missing post.', 'reactions' ) ) );
@@ -208,7 +210,7 @@ class DW_Reaction {
 			wp_send_json_error( array( 'message' => __( 'Missing type.', 'reactions' ) ) );
 		}
 
-		if ( 'unvote' == $vote_type && !is_user_logged_in() ) return;
+		if ( 'yes' == $voted && !is_user_logged_in() ) return;
 		// delete old reactions
 		$is_liked = $this->is_liked( get_current_user_id(), $post_id );
 		if ( $is_liked ) {
@@ -220,10 +222,11 @@ class DW_Reaction {
 					$total = (int) $total - 1;
 					update_post_meta( $post_id, 'dw_reaction_total_liked', $total );
 				}
-				ob_start();
-				$this->count_like_layout( $post_id );
-				$content = ob_get_clean();
+
+				$content = $this->count_like_layout( $post_id );
+
 				wp_send_json_success( array( 'html' => $content, 'type' => 'unvoted' ) );
+				exit();
 			}
 		}
 
@@ -247,6 +250,7 @@ class DW_Reaction {
 		$content = $this->count_like_layout( $post_id );
 
 		wp_send_json_success( array( 'html' => $content, 'type' => 'voted' ) );
+		exit();
 	}
 
 	/**
