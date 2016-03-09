@@ -3,7 +3,7 @@ Contributors: designwall
 Tags: reactions, reaction, facebook reactions, facebook, like, emotions, votes, voting, rating, wordpress reactions
 Requires at least: 3.0
 Tested up to: 4.4.2
-Stable tag: 1.0.1
+Stable tag: 1.0.1.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 

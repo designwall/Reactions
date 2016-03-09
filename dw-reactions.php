@@ -6,7 +6,7 @@
 * Author: DesignWall
 * Author URI: https://www.designwal.com/
 *
-* Version: 1.0.1
+* Version: 1.0.1.2
 * Text Domain: reactions
 */
 
@@ -183,7 +183,6 @@ class DW_Reaction {
 	public function enqueue_script() {
 		wp_enqueue_style( 'dw-reaction-style', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'assets/css/style.css' );
 		wp_enqueue_script( 'dw-reaction-script', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'assets/js/script.js', array( 'jquery' ), true );
-		wp_enqueue_script( 'jquery_mobile', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'assets/js/jquery.mobile-1.4.5.min.js', array( 'jquery' ), '1.4.5' );
 		$localize = array(
 			'ajax' => admin_url( 'admin-ajax.php' ),
 		);
