@@ -200,7 +200,7 @@ class DW_Reaction {
 		$post_id = intval( $_POST['post'] );
 		$type = sanitize_title( $_POST['type'] );
 		$vote_type = sanitize_title( $_POST['vote_type'] );
-		$voted = sanitize_title( $_POST['voted'] );
+		$voted = isset( $_POST['voted'] ) ? sanitize_title( $_POST['voted'] ) : 'no';
 
 		if ( empty( $post_id ) ) {
 			wp_send_json_error( array( 'message' => __( 'Missing post.', 'reactions' ) ) );
@@ -433,7 +433,7 @@ class DW_Reaction {
 	public function anonymous_can_vote() {
 		$options = get_option( 'dw_reactions', array() );
 
-		return isset( $options['anonymous_can_vote'] ) || 'on' == $options['anonymous_can_vote'] ? true : false;
+		return isset( $options['anonymous_can_vote'] ) && 'on' == $options['anonymous_can_vote'] ? true : false;
 	}
 
 	/**

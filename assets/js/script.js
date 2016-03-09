@@ -35,7 +35,7 @@ jQuery(document).ready(function($){
 		e.preventDefault();
 
 		var t = $(this), $class = t.attr('class'), main = t.parent().parent().parent(), vote_type = main.attr('data-type'), voted = main.attr('data-vote'), text = t.find('strong').text();
-		console.log(main);
+		
 		res = $class.split(' ');
 		type = res[1].split('-');
 
