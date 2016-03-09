@@ -17,7 +17,6 @@ class DW_Reaction {
 	public function __construct() {
 		// register shortcode
 		add_shortcode( 'reactions', array( $this, 'shortcode_reactions' ) );
-		add_shortcode( 'reactions_count', array( $this, 'shortcode_reactions_count' ) );
 		register_activation_hook( __FILE__, array( $this, 'set_default_setting' ) );
 
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_script' ) );
@@ -64,7 +63,10 @@ class DW_Reaction {
 	* WordPress header hook
 	*/
 	public function head() {
-		add_filter( 'the_content', array( $this, 'replace_content' ), 99 );
+		// add reactions to the content
+		add_filter( 'the_content', array( $this, 'replace_content' ) );
+		// add reactions to the excerpt
+		add_filter( 'get_the_excerpt', array( $this, 'replace_content_excerpt' ) );
 	}
 
 	/**
@@ -76,18 +78,33 @@ class DW_Reaction {
 	public function replace_content( $content ) {
 		if ( $this->is_enable() ) {
 			if ( $this->enable_in_single_post() || $this->enable_in_archive() || $this->enable_in_pages() || $this->enable_in_home() ) {
+				$fullcontent = '';
 				if ( $this->position( 'above' ) ) {
-					echo $this->layout();
+					$fullcontent .= $this->layout();
 				}
 
-				echo $content;
+				$fullcontent .= $content;
 
 				if ( $this->position( 'below' ) ) {
-					echo $this->layout();
+					$fullcontent .= $this->layout();
 				}
 
-				return;
+				return $fullcontent;
 			}
+		}
+
+		return $content;
+	}
+
+	/**
+	* Add reactions to post/page excerpt
+	*
+	* @param string $content
+	* @param string
+	*/
+	public function replace_content_excerpt( $content ) {
+		if ( has_excerpt() && !is_single() ) {
+			$content = $this->replace_content( $content );
 		}
 
 		return $content;
@@ -106,7 +123,7 @@ class DW_Reaction {
 		$text = $this->get_reactions_text( get_current_user_id(), get_the_ID() );
 		$is_liked = $this->is_liked( get_current_user_id(), get_the_ID() );
 		$type = $is_liked ? 'unvote' : 'vote';
-
+		ob_start();
 		?>
 		<div class="dw-reactions dw-reactions-post-<?php the_ID() ?>">
 			<?php if ( $button ) : ?>
@@ -125,10 +142,16 @@ class DW_Reaction {
 				<?php endif; ?>
 			<?php endif; ?>
 			<?php if ( ( $this->enable_count() && $this->is_enable() ) || ( !$this->is_enable() && $count ) ) : ?>
-				<?php $this->count_like_layout( $post_id ); ?>
+				<div class="dw-reactions-count">
+					<?php echo $this->count_like_layout( $post_id ); ?>
+				</div>
 			<?php endif; ?>
 		</div>
 		<?php
+		$content = ob_get_contents();
+		ob_get_clean();
+
+		return $content;
 	}
 
 	/**
@@ -142,15 +165,15 @@ class DW_Reaction {
 		}
 		$reactions = array( 'like', 'love', 'haha', 'wow', 'sad', 'angry' );
 		$total = get_post_meta( $post_id, 'dw_reaction_total_liked', true );
-		echo '<div class="dw-reactions-count">';
 		foreach( $reactions as $reaction ) {
 			$count = get_post_meta( $post_id, 'dw_reaction_' . $reaction );
 
 			if ( !empty( $count ) ) {
-				echo '<span class="dw-reaction-count dw-reaction-count-'.esc_attr( $reaction ).'"><strong>'.esc_attr( count( $count ) ).'</strong></span>';
+				$output .= '<span class="dw-reaction-count dw-reaction-count-'.esc_attr( $reaction ).'"><strong>'.esc_attr( count( $count ) ).'</strong></span>';
 			}
 		}
-		echo '</div>';
+
+		return $output;
 	}
 
 	/**
@@ -221,9 +244,7 @@ class DW_Reaction {
 		// update to database
 		add_post_meta( $post_id, 'dw_reaction_' . $type, $user_id );
 
-		ob_start();
-		$this->count_like_layout( $post_id );
-		$content = ob_get_clean();
+		$content = $this->count_like_layout( $post_id );
 
 		wp_send_json_success( array( 'html' => $content, 'type' => 'voted' ) );
 	}
@@ -295,19 +316,6 @@ class DW_Reaction {
 	}
 
 	/**
-	* Reactions count short code
-	*
-	* @param array $atts
-	*/
-	public function shortcode_reactions_count( $atts = array() ) {
-		extract( shortcode_atts( array(
-			'id' => get_the_ID()
-		), $atts, 'reactions_count' ) );
-
-		echo $this->count_like_layout( $id );
-	}
-
-	/**
 	* Register settings page
 	*/
 	public function settings_page() {
@@ -366,15 +374,15 @@ class DW_Reaction {
 				<h3><?php esc_attr_e( '2. Manually insert into your theme.', 'reactions' ) ?></h3>
 				<p>
 
-					<p><?php esc_attr_e( '1. Open <code>wp-content/themes/&lt;Your theme folder&gt;/</code>.', 'reactions' ); ?></p>
-					<p><?php esc_attr_e( '2. You may place it in <code>archive.php</code>, <code>single.php</code>, <code>post.php</code> or <code>page.php</code> also.', 'reactions' ); ?></p>
-					<p><?php esc_attr_e( '3. Find <code>&lt;&#63;php while (have_posts()) : the_post(); &#63;&gt;</code>.', 'reactions' ); ?></p>
-					<p><?php esc_attr_e( "4. Add anywhere below it (The place you want Reactions to show): <code>&lt;&#63;php if (function_exists('dw_reactions')) { dw_reactions() } &#63;&gt;</code>.", 'reactions' ); ?></p>
+					<p><?php _e( '1. Open <code>wp-content/themes/&lt;Your theme folder&gt;/</code>.', 'reactions' ); ?></p>
+					<p><?php _e( '2. You may place it in <code>archive.php</code>, <code>single.php</code>, <code>post.php</code> or <code>page.php</code> also.', 'reactions' ); ?></p>
+					<p><?php _e( '3. Find <code>&lt;&#63;php while (have_posts()) : the_post(); &#63;&gt;</code>.', 'reactions' ); ?></p>
+					<p><?php _e( "4. Add anywhere below it (The place you want Reactions to show): <code>&lt;&#63;php if (function_exists('dw_reactions')) { dw_reactions() } &#63;&gt;</code>.", 'reactions' ); ?></p>
 					<hr>
-					<p><?php esc_attr_e( 'If you DO NOT want the reactions to appear in every post/page, DO NOT use the code above. Just type in <code>[reactions]</code> into the selected post/page and it will embed reactions into that post/page only.', 'reactions' ); ?></p>
-					<p><?php esc_attr_e( 'If you to use reactions button for specific post/page you can use this short code <code>[reactions id="1"]</code>, where 1 is the ID of the post/page.', 'reactions' ); ?></p>
-					<p><?php esc_attr_e( 'If you want to show reactions button you can use <code>[reactions count=false button=true]</code>.', 'reactions' ) ?></p>
-					<p><?php esc_attr_e( 'If you want to show reactions count you can use <code>[reactions count=true button=false]</code>.', 'reactions' ) ?></p>
+					<p><?php _e( 'If you DO NOT want the reactions to appear in every post/page, DO NOT use the code above. Just type in <code>[reactions]</code> into the selected post/page and it will embed reactions into that post/page only.', 'reactions' ); ?></p>
+					<p><?php _e( 'If you to use reactions button for specific post/page you can use this short code <code>[reactions id="1"]</code>, where 1 is the ID of the post/page.', 'reactions' ); ?></p>
+					<p><?php _e( 'If you want to show reactions button you can use <code>[reactions count=false button=true]</code>.', 'reactions' ) ?></p>
+					<p><?php _e( 'If you want to show reactions count you can use <code>[reactions count=true button=false]</code>.', 'reactions' ) ?></p>
 				</p>
 				<button type="submit" class="button button-primary"><?php esc_attr_e( 'Save changes', 'reactions' ) ?></button>
 			</form>
@@ -529,16 +537,6 @@ class DW_Reaction {
 function dw_reactions( $post_id = false, $button = true, $count = true ) {
 	$reactions = new DW_Reaction();
 	echo $reactions->layout( $post_id, $button, $count );
-}
-
-/**
-* Print reactions vote count
-*
-* @param int $post_id (default: false)
-*/
-function dw_reactions_count( $post_id = false ) {
-	$reactions = new DW_Reaction();
-	echo $reactions->count_like_layout( $post_id );
 }
 
 new DW_Reaction();
