@@ -60,6 +60,7 @@ Emotion icons by [EmojiOne](http://emojione.com/), License: [Creative Commons (C
 
 = 1.0.1 =
 * New: Anonymous can reactions
+* Fix: Break layout
 
 = 1.0.0 =
 * First release
