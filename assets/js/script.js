@@ -50,7 +50,6 @@ jQuery(document).ready(function($){
 				nonce: main.data('nonce'),
 				type: type[2],
 				post: main.data('post'),
-				vote_type: vote_type,
 				voted: voted
 			},
 			success: function(data) {

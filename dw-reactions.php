@@ -199,7 +199,7 @@ class DW_Reaction {
 
 		$post_id = intval( $_POST['post'] );
 		$type = sanitize_title( $_POST['type'] );
-		$vote_type = sanitize_title( $_POST['vote_type'] );
+		$vote_type = isset( $_POST['vote_type'] ) ? sanitize_title( $_POST['vote_type'] ) : 'vote';
 		$voted = isset( $_POST['voted'] ) ? sanitize_title( $_POST['voted'] ) : 'no';
 
 		if ( empty( $post_id ) ) {
