@@ -56,6 +56,11 @@ Emotion icons by [EmojiOne](http://emojione.com/), License: [Creative Commons (C
 - If you want to show reactions button you can use `[reactions count="false" button="true"]`.
 - If you want to show reactions count you can use `[reactions count="true" button="false"]`.
 
+== Screenshot ==
+
+1. Front-end
+2. Back-end
+
 == Changelog ==
 
 = 1.0.1 =
