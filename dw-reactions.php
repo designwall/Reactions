@@ -186,7 +186,13 @@ class DW_Reaction {
 		wp_enqueue_style( 'dw-reaction-style', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'assets/css/style.css', array(), self::$timeversion );
 		wp_enqueue_script( 'dw-reaction-script', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'assets/js/script.js', array( 'jquery' ), self::$timeversion );
 		$localize = array(
-			'ajax' => admin_url( 'admin-ajax.php' ),
+			'ajax' 	=> admin_url( 'admin-ajax.php' ),
+			'like'	=> __( 'Like', 'reactions' ),
+			'love'	=> __( 'Love', 'reactions' ),
+			'haha'	=> __( 'Haha', 'reactions' ),
+			'wow'	=> __( 'Wow', 'reactions' ),
+			'sad'	=> __( 'Sad', 'reactions' ),
+			'angry'	=> __( 'Angry', 'reactions' )
 		);
 
 		wp_localize_script( 'dw-reaction-script', 'dw_reaction', $localize );

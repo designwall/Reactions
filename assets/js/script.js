@@ -84,7 +84,7 @@
 			success: function(data) {
 				if ( data.success ) {
 					if ( data.data.type == 'unvoted' ) {
-						$('.dw-reactions-post-'+parent.data('post')).find('.dw-reactions-main-button').attr('class', 'dw-reactions-main-button').text(text);
+						$('.dw-reactions-post-'+parent.data('post')).find('.dw-reactions-main-button').attr('class', 'dw-reactions-main-button').text(dw_reaction.like);
 						parent.attr('data-type', 'vote');
 					} else {
 						$('.dw-reactions-post-'+parent.data('post')).find('.dw-reactions-main-button').addClass('dw_reaction_like');
