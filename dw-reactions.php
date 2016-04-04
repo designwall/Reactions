@@ -6,11 +6,13 @@
 * Author: DesignWall
 * Author URI: https://www.designwal.com/
 *
-* Version: 1.0.1.2
+* Version: 1.0.1.3
 * Text Domain: reactions
 */
 
 class DW_Reaction {
+	private static $timeversion = 120004042016;
+
 	/**
 	* Class Construct
 	*/
@@ -181,8 +183,8 @@ class DW_Reaction {
 	* Enqueue plugin's style/script
 	*/
 	public function enqueue_script() {
-		wp_enqueue_style( 'dw-reaction-style', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'assets/css/style.css' );
-		wp_enqueue_script( 'dw-reaction-script', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'assets/js/script.js', array( 'jquery' ), true );
+		wp_enqueue_style( 'dw-reaction-style', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'assets/css/style.css', array(), self::$timeversion );
+		wp_enqueue_script( 'dw-reaction-script', trailingslashit( plugin_dir_url( __FILE__ ) ) . 'assets/js/script.js', array( 'jquery' ), self::$timeversion );
 		$localize = array(
 			'ajax' => admin_url( 'admin-ajax.php' ),
 		);
@@ -380,7 +382,7 @@ class DW_Reaction {
 					<p><?php _e( '1. Open <code>wp-content/themes/&lt;Your theme folder&gt;/</code>.', 'reactions' ); ?></p>
 					<p><?php _e( '2. You may place it in <code>archive.php</code>, <code>single.php</code>, <code>post.php</code> or <code>page.php</code> also.', 'reactions' ); ?></p>
 					<p><?php _e( '3. Find <code>&lt;&#63;php while (have_posts()) : the_post(); &#63;&gt;</code>.', 'reactions' ); ?></p>
-					<p><?php _e( "4. Add anywhere below it (The place you want Reactions to show): <code>&lt;&#63;php if (function_exists('dw_reactions')) { dw_reactions() } &#63;&gt;</code>.", 'reactions' ); ?></p>
+					<p><?php _e( "4. Add anywhere below it (The place you want Reactions to show): <code>&lt;&#63;php if (function_exists('dw_reactions')) { dw_reactions(); } &#63;&gt;</code>.", 'reactions' ); ?></p>
 					<hr>
 					<p><?php _e( 'If you DO NOT want the reactions to appear in every post/page, DO NOT use the code above. Just type in <code>[reactions]</code> into the selected post/page and it will embed reactions into that post/page only.', 'reactions' ); ?></p>
 					<p><?php _e( 'If you to use reactions button for specific post/page you can use this short code <code>[reactions id="1"]</code>, where 1 is the ID of the post/page.', 'reactions' ); ?></p>

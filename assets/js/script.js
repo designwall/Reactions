@@ -1,29 +1,29 @@
-jQuery(document).ready(function($){
+(function($){
 	$.fn.extend({
-	disableSelection: function() {
-		this.each(function() {
-			this.onselectstart = function() {
-			    return false;
-			};
-			this.unselectable = "on";
-			$(this).css('-moz-user-select', 'none');
-			$(this).css('-webkit-user-select', 'none');
-			$(this).css('-ms-user-select', 'none');
-			$(this).css('user-select', 'none');
-		});
-		return this;
+		disableSelection: function() {
+			this.each(function() {
+				this.onselectstart = function() {
+				    return false;
+				};
+				this.unselectable = "on";
+				$(this).css('-moz-user-select', 'none');
+				$(this).css('-webkit-user-select', 'none');
+				$(this).css('-ms-user-select', 'none');
+				$(this).css('user-select', 'none');
+			});
+			return this;
 		}
 	});
 
-	$('div.dw-reactions-button').mouseenter(function(e){
+	$(document).on( 'mouseenter', 'div.dw-reactions-button', function(e){
 		$(this).addClass('reaction-show');
 	});
 
-	$('div.dw-reactions-button').mouseleave(function(e){
+	$(document).on('mouseleave', 'div.dw-reactions-button', function(e){
 		$(this).removeClass('reaction-show');
 	});
 
-	$('div.dw-reactions-button').on('taphold',function(e){
+	$(document).on('taphold','div.dw-reactions-button',function(e){
 		e.preventDefault();
 		$(this).addClass('reaction-show');
 		$(this).disableSelection();
@@ -31,7 +31,7 @@ jQuery(document).ready(function($){
 
 	$('div.dw-reactions-button').disableSelection();
 
-	$('.dw-reaction').on('click', function(e){
+	$(document).on('click', '.dw-reaction', function(e){
 		e.preventDefault();
 
 		var t = $(this), $class = t.attr('class'), main = t.parent().parent().parent(), vote_type = main.attr('data-type'), voted = main.attr('data-vote'), text = t.find('strong').text();
@@ -62,7 +62,7 @@ jQuery(document).ready(function($){
 		});
 	});
 
-	$('.dw-reactions-main-button').on('click', function(e) {
+	$(document).on('click','.dw-reactions-main-button', function(e) {
 		e.preventDefault();
 
 		var t = $(this), parent = t.parent().parent();
@@ -95,4 +95,4 @@ jQuery(document).ready(function($){
 			}
 		});
 	})
-});
+})(jQuery);
